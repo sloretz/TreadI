@@ -11,10 +11,16 @@ USERNAME: /[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-z0-9])?/
 
 maybe_negated_statement: "-"? statement
 
-statement: "type"       ":" ("issue" | "pr")
-         | "author"     ":" USERNAME
-         | "assignee"   ":" USERNAME
-         | "is"         ":" "draft"
-         | "review"     ":" ("none" | "approved" | "changes_requested")
-         | "repo"       ":" USERNAME "/" USERNAME
+statement: type_stmt
+         | author_stmt
+         | assignee_stmt
+         | is_stmt
+         | review_stmt
+         | repo_stmt
  
+type_stmt: "type" ":" ("issue" | "pr")
+author_stmt: "author" ":" USERNAME
+assignee_stmt: "assignee" ":" USERNAME
+is_stmt: "is" ":" "draft"
+review_stmt: "review" ":" ("none" | "approved" | "changes_requested")
+repo_stmt: "repo" ":" USERNAME "/" USERNAME
