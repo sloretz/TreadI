@@ -1,0 +1,20 @@
+
+
+start:  maybe_negated_statement (" " maybe_negated_statement)*
+
+# TODO forbid consecutive hypens, but maybe don't bother.
+#
+#   "Username may only contain alphanumeric characters
+#   or single hyphens, and cannot begin or end with a hyphen."
+#
+USERNAME: /[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-z0-9])?/
+
+maybe_negated_statement: "-"? statement
+
+statement: "type"       ":" ("issue" | "pr")
+         | "author"     ":" USERNAME
+         | "assignee"   ":" USERNAME
+         | "is"         ":" "draft"
+         | "review"     ":" ("none" | "approved" | "changes_requested")
+         | "repo"       ":" USERNAME "/" USERNAME
+ 
