@@ -19,6 +19,7 @@ class Issue:
     url: str = ""
     # Has the current viewer looked at this issue or PR?
     is_read: bool = False
+    is_pr: bool = False
 
 
 def is_same_issue(l, r):

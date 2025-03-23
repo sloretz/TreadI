@@ -8,8 +8,9 @@ start:  maybe_negated_statement (" " maybe_negated_statement)*
 #   or single hyphens, and cannot begin or end with a hyphen."
 #
 USERNAME: /[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-z0-9])?/
+MINUS: "-"
 
-maybe_negated_statement: "-"? statement
+maybe_negated_statement: MINUS? statement
 
 statement: type_stmt
          | author_stmt
@@ -18,9 +19,16 @@ statement: type_stmt
          | review_stmt
          | repo_stmt
  
-type_stmt: "type" ":" ("issue" | "pr")
+ISSUE: "issue"
+PR: "pr"
+DRAFT: "draft"
+NONE: "none"
+APPROVED: "approved"
+CHANGES_REQUESTED: "changes_requested"
+
+type_stmt: "type" ":" (ISSUE | PR)
 author_stmt: "author" ":" USERNAME
 assignee_stmt: "assignee" ":" USERNAME
-is_stmt: "is" ":" "draft"
-review_stmt: "review" ":" ("none" | "approved" | "changes_requested")
+is_stmt: "is" ":" DRAFT
+review_stmt: "review" ":" (NONE | APPROVED | CHANGES_REQUESTED)
 repo_stmt: "repo" ":" USERNAME "/" USERNAME
