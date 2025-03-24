@@ -923,7 +923,6 @@ dependencies = [
     { name = "gql", extra = ["requests"] },
     { name = "keyring" },
     { name = "kivy" },
-    { name = "lark", extra = ["interegular"] },
     { name = "python-dateutil" },
     { name = "pyyaml" },
     { name = "requests" },
@@ -932,6 +931,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "black" },
+    { name = "lark", extra = ["interegular"] },
     { name = "pytest" },
 ]
 
@@ -940,7 +940,6 @@ requires-dist = [
     { name = "gql", extras = ["requests"], specifier = ">=3.5.0" },
     { name = "keyring", specifier = ">=25.6.0" },
     { name = "kivy", specifier = ">=2.3.1" },
-    { name = "lark", extras = ["interegular"], specifier = ">=1.2.2" },
     { name = "python-dateutil", specifier = ">=2.8.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "requests", specifier = ">=2.32.3" },
@@ -949,6 +948,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "black", specifier = ">=25.1.0" },
+    { name = "lark", extras = ["interegular"], specifier = ">=1.2.2" },
     { name = "pytest", specifier = ">=7.0.0" },
 ]
 

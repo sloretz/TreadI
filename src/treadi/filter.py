@@ -4,7 +4,7 @@ import pathlib
 from treadi.data import Issue
 
 GRAMMAR = (pathlib.Path(__file__).parent.resolve() / "filter.lark").read_text()
-PARSER = lark.Lark(GRAMMAR, parser="lalr", strict=True)
+PARSER = lark.Lark(GRAMMAR, parser="lalr")
 
 
 def require_pr(issue: Issue):
