@@ -1,7 +1,3 @@
-# Filtering of issues and PRs
-# The syntax is a subset of github search filters
-# https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/filtering-and-searching-issues-and-pull-requests
-
 import lark
 import pathlib
 
@@ -94,6 +90,10 @@ class FilterTransformer(lark.Transformer):
         raise NotImplementedError
 
     def is_stmt(self, args):
+        if args[0] == "pr":
+            return require_pr
+        if args[0] == "issue":
+            return require_issue
         raise NotImplementedError
 
     def review_stmt(self, args):

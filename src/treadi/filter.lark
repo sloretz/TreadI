@@ -1,4 +1,6 @@
-
+# Filtering of issues and PRs
+# The syntax is a subset of github search filters
+# https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests
 
 start:  maybe_negated_statement (" " maybe_negated_statement)*
 
@@ -29,6 +31,6 @@ CHANGES_REQUESTED: "changes_requested"
 type_stmt: "type" ":" (ISSUE | PR)
 author_stmt: "author" ":" USERNAME
 assignee_stmt: "assignee" ":" USERNAME
-is_stmt: "is" ":" DRAFT
+is_stmt: "is" ":" (DRAFT | ISSUE | PR)
 review_stmt: "review" ":" (NONE | APPROVED | CHANGES_REQUESTED)
 repo_stmt: "repo" ":" USERNAME "/" USERNAME

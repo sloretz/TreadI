@@ -91,11 +91,22 @@
 
 
 <IssueScreen>:
-    StackLayout:
-        id: stack
-        orientation: "tb-lr"
-        padding: '3dp'
-        spacing: '3dp'
+    BoxLayout:
+        orientation: "vertical"
+        padding: '0dp'
+        TextInput:
+            id: filter
+            size_hint: (None, None)
+            size: root.width, '40dp'
+            font_size: '17sp'
+            hint_text: 'author:sloretz is:pr ...'
+            multiline: False
+            on_text_validate: root.validate_filter()
+        StackLayout:
+            id: stack
+            orientation: "tb-lr"
+            padding: '3dp'
+            spacing: '3dp'
 
 
 <RepoPickerScreen>:
