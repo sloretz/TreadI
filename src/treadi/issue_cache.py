@@ -62,13 +62,13 @@ class IssueCache:
                 self.__dismissed.append(u)
                 return
 
-    def most_recent_issues(self, n=1):
+    def most_recent_issues(self, n=1, filter=None):
         """
         Return the n most recently updated and not
         dismissed issues.
         """
         with self.__lock:
-            return self._most_recent_issues(n)
+            return self._most_recent_issues(n, filter)
 
     def newest_update_time(self):
         with self.__lock:
@@ -85,9 +85,18 @@ class IssueCache:
             return d[0].updated_at
         return u[0].updated_at
 
-    def _most_recent_issues(self, n):
+    def _most_recent_issues(self, n, filter):
         self._sort()
-        return self.__upcomming[:n]
+        if filter is None:
+            return self.__upcomming[:n]
+        issues = []
+        for i in self.__upcomming:
+            if filter(i):
+                # True means it passes the filter
+                issues.append(i)
+            if len(issues) >= n:
+                break
+        return issues
 
     def _sort(self):
         self.__upcomming.sort(reverse=True, key=lambda i: i.updated_at)

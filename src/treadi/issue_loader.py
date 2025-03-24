@@ -9,7 +9,7 @@ from .data import Issue
 from .data import Repository
 
 
-def _make_issue(gh_data):
+def _make_issue(gh_data, is_pr=False):
     repo = Repository(
         owner=gh_data["repository"]["owner"]["login"],
         name=gh_data["repository"]["name"],
@@ -28,6 +28,7 @@ def _make_issue(gh_data):
         title=gh_data["title"],
         url=gh_data["url"],
         is_read=bool(gh_data["isReadByViewer"]),
+        is_pr=is_pr,
     )
 
 
@@ -217,7 +218,7 @@ class IssueLoader:
                         del issue_page_info[r]
                 if "pullRequests" in repo_result:
                     for pr in repo_result["pullRequests"]["nodes"]:
-                        self._cache.insert(_make_issue(pr))
+                        self._cache.insert(_make_issue(pr, is_pr=True))
                         pr_count += 1
                     if repo_result["pullRequests"]["pageInfo"]["hasNextPage"]:
                         pr_page_info[r] = repo_result["pullRequests"]["pageInfo"]
@@ -255,4 +256,4 @@ class IssueLoader:
 
         prs = self._client.execute(gql(make_query("is:pr")))
         for pr in prs["search"]["nodes"]:
-            self._cache.insert(_make_issue(pr))
+            self._cache.insert(_make_issue(pr, is_pr=True))

@@ -50,6 +50,7 @@ line-length = 88
 dev = [
     "black>=25.1.0",
     "pytest>=7.0.0",
+    "lark[interegular]>=1.2.2",
 ]
 
 [tool.pytest.ini_options]

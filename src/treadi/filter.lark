@@ -1,0 +1,36 @@
+# Filtering of issues and PRs
+# The syntax is a subset of github search filters
+# https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests
+
+start:  maybe_negated_statement (" "+ maybe_negated_statement)*
+
+# TODO forbid consecutive hypens, but maybe don't bother.
+#
+#   "Username may only contain alphanumeric characters
+#   or single hyphens, and cannot begin or end with a hyphen."
+#
+USERNAME: /[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-z0-9])?/
+MINUS: "-"
+
+maybe_negated_statement: MINUS? statement
+
+statement: type_stmt
+         | author_stmt
+         | assignee_stmt
+         | is_stmt
+         | review_stmt
+         | repo_stmt
+ 
+ISSUE: "issue"
+PR: "pr"
+DRAFT: "draft"
+NONE: "none"
+APPROVED: "approved"
+CHANGES_REQUESTED: "changes_requested"
+
+type_stmt: "type" ":" (ISSUE | PR)
+author_stmt: "author" ":" USERNAME
+assignee_stmt: "assignee" ":" USERNAME
+is_stmt: "is" ":" (DRAFT | ISSUE | PR)
+review_stmt: "review" ":" (NONE | APPROVED | CHANGES_REQUESTED)
+repo_stmt: "repo" ":" USERNAME "/" USERNAME

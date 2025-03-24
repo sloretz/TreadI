@@ -11,7 +11,7 @@ Config.set("graphics", "resizable", False)
 Config.set("input", "mouse", "mouse,disable_multitouch")
 from kivy.core.window import Window
 
-Window.size = (500, 518)
+Window.size = (500, 558)
 from kivy.properties import ColorProperty
 from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
@@ -27,6 +27,7 @@ import webbrowser
 import requests
 import threading
 import time
+import logging
 import pathlib
 
 from gql import gql, Client
@@ -42,6 +43,7 @@ from .repo_loader import OrgRepoLoader
 from .repo_loader import FileRepoLoader
 from .repo_loader import SequentialRepoLoaders
 from .repo_loader import VcsRepoLoader
+from .filter import parse as parse_filter
 
 
 USERNAME = None
@@ -95,9 +97,42 @@ class IssueWidget(ButtonBehavior, BoxLayout):
 
 class IssueScreen(Screen):
 
+    def __init__(self, *args, **kwargs):
+        self._filter = None
+        self._logger = logging.getLogger("IssueLoader")
+        super().__init__(*args, **kwargs)
+
+    def validate_filter(self):
+        # Called when on_validate_text is called on filter TextInput
+        filter_str = self.ids.filter.text
+        if filter_str.strip() == "":
+            self._filter = None
+            self.ids.filter.background_color = (1, 1, 1, 1)
+        else:
+            try:
+                self._filter = parse_filter(filter_str.strip())
+                self.ids.filter.background_color = (0.9, 1, 0.9, 1)
+            except:
+                self._logger.exception("Cannot parse filter")
+                self._filter = None
+                self.ids.filter.background_color = (1, 0.5, 0.5, 1)
+
+        self._refresh_issues()
+
+    def on_text_changing(self):
+        # called hen on_text is called on filter TextInput
+        # Filters don't apply until the user hits enter, so display as yellow
+        self.ids.filter.background_color = (1, 1, 0.9, 1)
+
     def on_pre_enter(self):
         issue_cache = App.get_running_app().issue_cache
-        issues = issue_cache.most_recent_issues(n=5)
+        self._refresh_issues()
+
+    def _refresh_issues(self):
+        # Clear and re-add issues
+        self.ids.stack.clear_widgets()
+        issue_cache = App.get_running_app().issue_cache
+        issues = issue_cache.most_recent_issues(n=5, filter=self._filter)
         for i in issues:
             self._add_issue(i)
 
@@ -116,7 +151,9 @@ class IssueScreen(Screen):
                 child_issues.append(child.issue)
 
         # aim for 1 additional issue, because one is being dismissed
-        consider_issues = issue_cache.most_recent_issues(n=1 + len(child_issues))
+        consider_issues = issue_cache.most_recent_issues(
+            n=1 + len(child_issues), filter=self._filter
+        )
         for itc in consider_issues:
             displaying_issue = False
             for chi in child_issues:
