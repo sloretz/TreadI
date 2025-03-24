@@ -5,13 +5,11 @@ TreadI helps you keep your head above water!
 
 <img src="doc/images/issue_screen.png" alt="TreadI screen displaying issues and PRs" width="400"/>
 
-Do you maintain 200 open source repos? No problem.
 TreadI displays the 5 most recently updated issues and PRs from any number of repos.
 
-Click an issue or PR to open it up in your web browser.
+Click an issue or PR to open it in your web browser.
 Click **dismiss** when you've handled it.
 Dismissed issues and PRs won't show up again until something new happens to them.
-
 
 ## Filter syntax
 
