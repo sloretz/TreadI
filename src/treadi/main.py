@@ -119,6 +119,11 @@ class IssueScreen(Screen):
 
         self._refresh_issues()
 
+    def on_text_changing(self):
+        # called hen on_text is called on filter TextInput
+        # Filters don't apply until the user hits enter, so display as yellow
+        self.ids.filter.background_color = (1, 1, 0.9, 1)
+
     def on_pre_enter(self):
         issue_cache = App.get_running_app().issue_cache
         self._refresh_issues()

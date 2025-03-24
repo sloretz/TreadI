@@ -102,6 +102,7 @@
             hint_text: 'author:sloretz is:pr ...'
             multiline: False
             on_text_validate: root.validate_filter()
+            on_text: root.on_text_changing()
         StackLayout:
             id: stack
             orientation: "tb-lr"
