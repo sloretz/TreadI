@@ -95,7 +95,8 @@ class IssueCache:
                 # True means it passes the filter
                 issues.append(i)
             if len(issues) >= n:
-                return issues
+                break
+        return issues
 
     def _sort(self):
         self.__upcomming.sort(reverse=True, key=lambda i: i.updated_at)

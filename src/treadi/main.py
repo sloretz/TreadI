@@ -128,8 +128,6 @@ class IssueScreen(Screen):
         self.ids.stack.clear_widgets()
         issue_cache = App.get_running_app().issue_cache
         issues = issue_cache.most_recent_issues(n=5, filter=self._filter)
-        if issues is None:
-            return
         for i in issues:
             self._add_issue(i)
 
