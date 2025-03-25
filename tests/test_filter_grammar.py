@@ -57,5 +57,7 @@ def test_review(parser):
 
 def test_repo(parser):
     parser.parse("repo:sloretz/TreadI")
+    parser.parse("repo:sloretz/rmw_zenow")
+    parser.parse("repo:sloretz/..--__Hello1")
     with pytest.raises(lark.UnexpectedToken):
         parser.parse("repo:sloretz")

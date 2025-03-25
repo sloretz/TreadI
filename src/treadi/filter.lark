@@ -10,6 +10,7 @@ start:  maybe_negated_statement (" "+ maybe_negated_statement)*
 #   or single hyphens, and cannot begin or end with a hyphen."
 #
 USERNAME: /[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-z0-9])?/
+REPOSITORY_NAME: /[-._a-zA-Z0-9]+/
 MINUS: "-"
 
 maybe_negated_statement: MINUS? statement
@@ -33,4 +34,4 @@ author_stmt: "author" ":" USERNAME
 assignee_stmt: "assignee" ":" USERNAME
 is_stmt: "is" ":" (DRAFT | ISSUE | PR)
 review_stmt: "review" ":" (NONE | APPROVED | CHANGES_REQUESTED)
-repo_stmt: "repo" ":" USERNAME "/" USERNAME
+repo_stmt: "repo" ":" USERNAME "/" REPOSITORY_NAME
