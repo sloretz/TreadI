@@ -1,0 +1,6 @@
+# Include all repositories that are probably managed by the OSRA Open-RMF PMC
+# https://www.open-rmf.org/
+#
+# I could not find a list on Open-RMF's website.
+
+org:open-rmf

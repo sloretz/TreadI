@@ -1,0 +1,6 @@
+# Include all repositories that are probably managed by the OSRA Infrastructure PMC
+# https://osralliance.org/wp-content/uploads/2024/03/infrastructure_project_charter.pdf
+#
+# I could not find an OSRA infrastructure website.
+
+https://raw.githubusercontent.com/ros-infrastructure/ci/refs/heads/main/ros-infrastructure.repos

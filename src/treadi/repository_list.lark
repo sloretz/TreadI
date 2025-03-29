@@ -1,0 +1,24 @@
+%import common.NEWLINE -> _NEWLINE
+%import common.WS_INLINE
+%ignore WS_INLINE
+
+COMMENT: "#" /[^\n]/*
+%ignore COMMENT
+
+start:  _NEWLINE* directive ( _NEWLINE+ directive)* _NEWLINE* 
+
+# TODO share with filter.lark
+USERNAME: /[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-z0-9])?/
+REPOSITORY_NAME: /[-._a-zA-Z0-9]+/
+ME: "@me"
+URL: /https:.+/
+
+directive: org_directive
+         | owned_by_directive
+         | url_directive
+         | single_repo_directive
+
+org_directive: "org:" USERNAME
+owned_by_directive: "owned_by:" (USERNAME | ME)
+url_directive: URL
+single_repo_directive: USERNAME "/" REPOSITORY_NAME

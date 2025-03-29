@@ -1,0 +1,3 @@
+# Include all repositories owned by the Github user who authenticated with TreadI
+
+owned_by:@me
