@@ -4,6 +4,10 @@ import pytest
 from unittest.mock import patch
 
 
+def test_config_dir():
+    assert tc.config_dir().name == "TreadI"
+
+
 def test_initialize_config(tmp_path):
     tc._initialize_config_dir(tmp_path)
 
