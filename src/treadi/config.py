@@ -104,7 +104,7 @@ class Config:
                 continue
             match = _REPO_LIST_REGEX.match(file.name)
             if match is None:
-                self._logger.warning("Invalid repository list file name: ", file.name)
+                self._logger.warning(f"Invalid repository list file name: {file.name}")
                 continue
             display_names.append(_make_repo_list_display_name(match.group("name")))
         return display_names
@@ -118,7 +118,7 @@ class Config:
         for file in repo_list_d.iterdir():
             match = _REPO_LIST_REGEX.match(file.name)
             if match is None:
-                self._logger.warning("Invalid repository list file name: ", file.name)
+                self._logger.warning(f"Invalid repository list file name: {file.name}")
                 continue
             found_name = _make_repo_list_display_name(match.group("name"))
             if found_name == display_name:
