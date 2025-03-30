@@ -3,4 +3,4 @@
 #
 # I could not find an OSRA infrastructure website.
 
-https://raw.githubusercontent.com/ros-infrastructure/ci/refs/heads/main/ros-infrastructure.repos
+vcstool:https://raw.githubusercontent.com/ros-infrastructure/ci/refs/heads/main/ros-infrastructure.repos

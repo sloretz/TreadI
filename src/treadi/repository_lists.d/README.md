@@ -32,7 +32,7 @@ Repository lists must have only one directive per line.
 To include a specifc repository in your repository list, use the format:
 
 ```
-org/repo
+owner/repo
 ```
 
 For example, to include issues and PRs from [TreadI's repository](https://github.com/sloretz/TreadI), put this line into your repository list:
@@ -60,7 +60,7 @@ org:gazebosim
 To include all repositories owned by a Github user, use the format:
 
 ```
-owned_by:username
+owned-by:username
 ```
 
 #### Directive: All repositories owned by the current user
@@ -68,19 +68,19 @@ owned_by:username
 To include all repositories owned by the Github user who launched TreadI, put this line into your repository list:
 
 ```
-owned_by:@me
+owned-by:@me
 ```
 
 #### Directive: vcstool URL
 
-To include all repositories in a [vcstool](https://github.com/dirk-thomas/vcstool) repos file in your repository list, put an `https://` URL on one line.
+To include all repositories in a [vcstool](https://github.com/dirk-thomas/vcstool) repos file in your repository list, put an `https://` URL on one line with `vcstool:` as a prefix.
 
 ```
-https://www.example.com/some/list.repos
+vcstool:https://www.example.com/some/list.repos
 ```
 
 For example, to include all issues and PRs from [ros2/ros2](https://github.com/ros2/ros2)'s ROS Rolling repos file, put this line into your repository list:
 
 ```
-https://raw.githubusercontent.com/ros2/ros2/refs/heads/rolling/ros2.repos
+vcstool:https://raw.githubusercontent.com/ros2/ros2/refs/heads/rolling/ros2.repos
 ```
