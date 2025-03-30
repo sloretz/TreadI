@@ -1,14 +1,44 @@
 import abc
+import pathlib
 import threading
 import time
-
 from gql import gql
-
 import requests
-
+import lark
 from yaml import safe_load as load_yaml
 
 from .data import Repository
+
+
+GRAMMAR = (pathlib.Path(__file__).parent.resolve() / "repository_list.lark").read_text()
+PARSER = lark.Lark(GRAMMAR, parser="lalr")
+
+
+class RepoLoaderTransformer(lark.Transformer):
+
+    def __init__(self, *, gql_client):
+        # TODO I would rather pass gql_client into begin_loading
+        self._gql_client = gql_client
+
+    def start(self, args):
+        return SequentialRepoLoaders(repo_loaders=args)
+
+    def directive(self, args):
+        return args[0]
+
+    def org_directive(self, args):
+        return OrgRepoLoader(organization=args[0], gql_client=self._gql_client)
+
+    def owned_by_directive(self, args):
+        if args[0] == "@me":
+            return CurrentUserRepoLoader(gql_client=self._gql_client)
+        return UserRepoLoader(args[0], gql_client=self._gql_client)
+
+    def vcstool_directive(self, args):
+        return VcsRepoLoader(url=args[0])
+
+    def single_repo_directive(self, args):
+        return SingleRepoLoader(owner=args[0], name=args[1])
 
 
 class RepoLoader(abc.ABC):
@@ -38,16 +68,32 @@ class RepoLoader(abc.ABC):
         self._thread = None
 
 
+def parse_repository_list(content: str, *, gql_client) -> RepoLoader:
+    """Parse the content of a repository list and return a RepoLoader for it."""
+    tree = PARSER.parse(content)
+    return RepoLoaderTransformer(gql_client=gql_client).transform(tree)
+
+
+class SingleRepoLoader(RepoLoader):
+
+    def __init__(self, owner, name):
+        self._repository = Repository(name=name, owner=owner)
+        super().__init__()
+
+    def load_repos(self):
+        return tuple([self._repository])
+
+
 class SequentialRepoLoaders(RepoLoader):
     """Invokes multiple repo loaders in a chain."""
 
-    def __init__(self, repo_loaders, *args, **kwargs):
-        self._loaders = repo_loaders
-        super().__init__(*args, **kwargs)
+    def __init__(self, repo_loaders):
+        self.repo_loaders = repo_loaders
+        super().__init__()
 
     def load_repos(self):
         repos = []
-        for loader in self._loaders:
+        for loader in self.repo_loaders:
             repos.extend(loader.load_repos())
         repos = tuple(set(repos))
         return repos
@@ -55,9 +101,9 @@ class SequentialRepoLoaders(RepoLoader):
 
 class CurrentUserRepoLoader(RepoLoader):
 
-    def __init__(self, gql_client, *args, **kwargs):
+    def __init__(self, gql_client):
         self._client = gql_client
-        super().__init__(*args, **kwargs)
+        super().__init__()
 
     def load_repos(self):
         repos = []
@@ -95,12 +141,61 @@ class CurrentUserRepoLoader(RepoLoader):
         return tuple(repos)
 
 
+class UserRepoLoader(RepoLoader):
+
+    def __init__(self, username, gql_client):
+        self._username = username
+        self._client = gql_client
+        super().__init__()
+
+    def load_repos(self):
+        repos = []
+
+        def _query(after=""):
+            query = gql(
+                """
+                query($username: String!, $after: String!) {
+                    user(login: $username) {
+                        repositories(after: $after, first: 100, visibility: PUBLIC, affiliations: [OWNER], isArchived: false) {
+                            nodes {
+                                nameWithOwner
+                            }
+                            pageInfo {
+                                endCursor
+                                hasNextPage
+                            }
+                        }
+                    }
+                }
+                """
+            )
+            result = self._client.execute(
+                query, variable_values={"username": self._username, "after": after}
+            )
+            return result
+
+        q = None
+        while q is None or q["user"]["repositories"]["pageInfo"]["hasNextPage"]:
+            if q is None:
+                q = _query("")
+            else:
+                q = _query(q["user"]["repositories"]["pageInfo"]["endCursor"])
+            for r in q["user"]["repositories"]["nodes"]:
+                owner, name = r["nameWithOwner"].split("/")
+                repos.append(Repository(name=name, owner=owner))
+        return tuple(repos)
+
+
 class OrgRepoLoader(RepoLoader):
 
-    def __init__(self, organization, gql_client, *args, **kwargs):
+    def __init__(
+        self,
+        organization,
+        gql_client,
+    ):
         self._client = gql_client
         self.organization = organization
-        super().__init__(*args, **kwargs)
+        super().__init__()
 
     def load_repos(self):
         repos = []
@@ -141,41 +236,11 @@ class OrgRepoLoader(RepoLoader):
         return tuple(repos)
 
 
-class FileRepoLoader(RepoLoader):
-
-    def __init__(self, filepath, *args, **kwargs):
-        self.filepath = filepath
-        super().__init__(*args, **kwargs)
-
-    def load_repos(self):
-        repos = []
-
-        with self.filepath.open() as f:
-            while line := f.readline():
-                print(line)
-                # Strip comments
-                if "#" in line:
-                    line = line[: line.find("#")]
-                # strip whitespace
-                line = line.strip()
-                if not line:
-                    # ingore blank lines
-                    continue
-                if line.count("/") != 1:
-                    raise RuntimeError(
-                        "Incorrect format: {line}. Use one owner/name per line."
-                    )
-                owner, name = line.split("/")
-                print(line)
-                repos.append(Repository(name=name, owner=owner))
-        return tuple(repos)
-
-
 class VcsRepoLoader(RepoLoader):
 
-    def __init__(self, url, *args, **kwargs):
+    def __init__(self, url):
         self.url = url
-        super().__init__(*args, **kwargs)
+        super().__init__()
 
     def load_repos(self):
         repos = []

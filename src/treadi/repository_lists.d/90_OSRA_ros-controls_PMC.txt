@@ -1,0 +1,18 @@
+# Include all repositories that are managed by the OSRA ros-controls PMC
+# https://control.ros.org/rolling/doc/governance/governance.html
+#
+# List as of 2025, March 29th
+
+ros-controls/ros2_control
+ros-controls/ros2_controllers
+ros-controls/ros2_control_cmake
+ros-controls/ros2_control_ci
+ros-controls/ros2_control_demos
+ros-controls/control_msgs
+ros-controls/control_toolbox
+ros-controls/control.ros.org
+ros-controls/gz_ros2_control
+ros-controls/kinematics_interface
+ros-controls/realtime_tools
+ros-controls/ros2_rhel
+ros-controls/ros2_debian

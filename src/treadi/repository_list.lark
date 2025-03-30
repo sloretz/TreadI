@@ -1,0 +1,27 @@
+%import common.NEWLINE -> _NEWLINE
+%import common.WS_INLINE
+%ignore WS_INLINE
+
+COMMENT: "#" /.*/ _NEWLINE?
+%ignore COMMENT
+
+start:  _NEWLINE* directive (_NEWLINE+ directive?)*
+
+ME: "@me"
+URL: /https:.+/
+REPOSITORY_NAME: /[-._a-zA-Z0-9]+/
+USERNAME.1: /[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-z0-9])?/
+
+_ORG.2: "org:"
+_OWNED_BY.2: "owned-by:"
+_VCSTOOL.2: "vcstool:"
+
+directive: org_directive
+         | owned_by_directive
+         | single_repo_directive
+         | vcstool_directive
+
+org_directive: _ORG USERNAME
+owned_by_directive: _OWNED_BY (USERNAME | ME)
+single_repo_directive: USERNAME "/" REPOSITORY_NAME
+vcstool_directive: _VCSTOOL URL

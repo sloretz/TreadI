@@ -1,0 +1,8 @@
+# Include all repositories that are probably managed by the OSRA Gazebo PMC
+# https://gazebosim.org/docs/latest/governance/
+#
+# I could not find a list on Gazebo's website.
+
+org:gazebosim
+org:gazebo-tooling
+org:gazebo-release
