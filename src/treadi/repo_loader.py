@@ -17,6 +17,7 @@ PARSER = lark.Lark(GRAMMAR, parser="lalr")
 class RepoLoaderTransformer(lark.Transformer):
 
     def __init__(self, *, gql_client):
+        # TODO I would rather pass gql_client into begin_loading
         self._gql_client = gql_client
 
     def start(self, args):
@@ -31,8 +32,7 @@ class RepoLoaderTransformer(lark.Transformer):
     def owned_by_directive(self, args):
         if args[0] == "@me":
             return CurrentUserRepoLoader(gql_client=self._gql_client)
-        # TODO Owned by anyone repo loader
-        return NotImplementedError
+        return UserRepoLoader(args[0], gql_client=self._gql_client)
 
     def vcstool_directive(self, args):
         return VcsRepoLoader(url=args[0])
@@ -137,6 +137,51 @@ class CurrentUserRepoLoader(RepoLoader):
             else:
                 q = _query(q["viewer"]["repositories"]["pageInfo"]["endCursor"])
             for r in q["viewer"]["repositories"]["nodes"]:
+                owner, name = r["nameWithOwner"].split("/")
+                repos.append(Repository(name=name, owner=owner))
+        return tuple(repos)
+
+
+class UserRepoLoader(RepoLoader):
+
+    def __init__(self, username, gql_client):
+        self._username = username
+        self._client = gql_client
+        super().__init__()
+
+    def load_repos(self):
+        repos = []
+
+        def _query(after=""):
+            query = gql(
+                """
+                query($username: String!, $after: String!) {
+                    user(login: $username) {
+                        repositories(after: $after, first: 100, visibility: PUBLIC, affiliations: [OWNER], isArchived: false) {
+                            nodes {
+                                nameWithOwner
+                            }
+                            pageInfo {
+                                endCursor
+                                hasNextPage
+                            }
+                        }
+                    }
+                }
+                """
+            )
+            result = self._client.execute(
+                query, variable_values={"username": self._username, "after": after}
+            )
+            return result
+
+        q = None
+        while q is None or q["user"]["repositories"]["pageInfo"]["hasNextPage"]:
+            if q is None:
+                q = _query("")
+            else:
+                q = _query(q["user"]["repositories"]["pageInfo"]["endCursor"])
+            for r in q["user"]["repositories"]["nodes"]:
                 owner, name = r["nameWithOwner"].split("/")
                 repos.append(Repository(name=name, owner=owner))
         return tuple(repos)
