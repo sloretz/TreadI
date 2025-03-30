@@ -79,7 +79,7 @@ def _initialize_config_dir(cdir: Path):
             )
         external_file = external_repos_d / internal_file.name
         if header:
-            external_file.write_text(header)
+            content = "\n".join([header, content])
         external_file.write_text(content)
 
 
