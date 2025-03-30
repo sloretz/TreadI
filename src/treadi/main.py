@@ -2,48 +2,29 @@ import kivy
 
 kivy.require("2.3.1")
 
-from kivy.animation import Animation
 from kivy.app import App
-from kivy.clock import Clock
-from kivy.config import Config
+from kivy.config import Config as KvConfig
 
-Config.set("graphics", "resizable", False)
-Config.set("input", "mouse", "mouse,disable_multitouch")
+KvConfig.set("graphics", "resizable", False)
+KvConfig.set("input", "mouse", "mouse,disable_multitouch")
+
 from kivy.core.window import Window
 
 Window.size = (500, 558)
-from kivy.properties import ColorProperty
-from kivy.properties import NumericProperty
-from kivy.properties import ObjectProperty
 
-from kivy.uix.behaviors import ButtonBehavior
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.stacklayout import StackLayout
-from kivy.uix.widget import Widget
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager
 
-import urllib
-import webbrowser
-import requests
-import threading
-import time
 import logging
 import pathlib
 
-from gql import gql, Client
+from gql import Client
 from gql.transport.requests import RequestsHTTPTransport
 
 from . import auth
 from . import config
-from .data import Issue
-from .data import is_same_issue
 from .issue_cache import IssueCache
-from .issue_loader import IssueLoader
-from .filter import parse as parse_filter
 from .screens.issue_screen import IssueScreen
 from .screens.login_screen import LoginScreen
-from .screens.repo_loading_screen import RepoLoadingScreen
 from .screens.repo_picker_screen import RepoPickerScreen
 
 
