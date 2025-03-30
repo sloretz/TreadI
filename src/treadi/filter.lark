@@ -21,6 +21,7 @@ statement: type_stmt
          | is_stmt
          | review_stmt
          | repo_stmt
+         | org_stmt
  
 ISSUE: "issue"
 PR: "pr"
@@ -35,3 +36,4 @@ assignee_stmt: "assignee" ":" USERNAME
 is_stmt: "is" ":" (DRAFT | ISSUE | PR)
 review_stmt: "review" ":" (NONE | APPROVED | CHANGES_REQUESTED)
 repo_stmt: "repo" ":" USERNAME "/" REPOSITORY_NAME
+org_stmt: "org" ":" USERNAME
