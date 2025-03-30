@@ -54,6 +54,11 @@ def test_require_repo():
     assert not tf.RequireRepo("ros2", "ros2")(ISSUE_ROS_ROSDISTRO)
 
 
+def test_require_repo():
+    assert tf.RequireOrg("ros")(ISSUE_ROS_ROSDISTRO)
+    assert not tf.RequireOrg("ros2")(ISSUE_ROS_ROSDISTRO)
+
+
 def test_invert_requirement():
     assert not tf.InvertRequirement(tf.require_pr)(PR_ROS_ROSDISTRO)
     assert tf.InvertRequirement(tf.require_pr)(ISSUE_ROS_ROSDISTRO)

@@ -19,6 +19,7 @@ Filter issues and PRs with a subset of the familiar [Github search syntax](https
 * `author:USERNAME` - Show issues and PRs opened by a user
 * `is:issue` - Show only Issues
 * `is:issue` - Show only PRs
+* `org:OWNER` - Show only PRs from the given organization or user
 * `repo:owner/name` - Show only things from the repo `owner/name`
 * `type:issue` - Same as `is:issue`
 * `type:pr` - Same as `is:pr`

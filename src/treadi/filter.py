@@ -41,6 +41,16 @@ class RequireRepo:
         )
 
 
+class RequireOrg:
+
+    def __init__(self, org):
+        self._org = org
+
+    def __call__(self, issue: Issue):
+        """Return True if the issue belongs to the given organization."""
+        return self._org.lower() == issue.repo.owner.lower()
+
+
 class InvertRequirement:
 
     def __init__(self, requirement):
@@ -101,6 +111,9 @@ class FilterTransformer(lark.Transformer):
 
     def repo_stmt(self, args):
         return RequireRepo(args[0].value, args[1].value)
+
+    def org_stmt(self, args):
+        return RequireOrg(args[0].value)
 
 
 def parse(filter: str):
