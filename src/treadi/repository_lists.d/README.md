@@ -1,21 +1,20 @@
 # TreadI repository_lists.d/
 
-TreadI's repo-picker screen displays repository lists that it finds in `repository_lists.d` directory.
-When you click on a repository list, TreadI will only display issues and PRs from repositories in that list.
+TreadI's repo-picker screen displays all repository lists present in the `repository_lists.d` directory.
 
 ## Create a repository list
 
-To make TreadI display your own custom repository list, create a file in `repository_lists.d/` with a name like this:
+To make TreadI use your own custom repository list, create a file in `repository_lists.d/` with a name like this:
 
 ```
 XX_Some_Name.txt
 ```
 
 Replace `XX` with a two digit number [`00`, `01`, `02`, ...`99`].
-TreadI displays repository lists with lower numbers first, and it sorts repositories with equal numbers alphabetically.
-
 Do not use spaces in the file name.
 TreadI displays `04_Some_Name.txt` as `Some Name` in the repo-picker screen.
+
+TreadI displays repository lists with lower numbers first, and it sorts repositories with equal numbers alphabetically.
 
 ## Repository list syntax
 

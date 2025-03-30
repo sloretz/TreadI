@@ -70,7 +70,6 @@ class RepoLoader(abc.ABC):
 
 def parse_repository_list(content: str, *, gql_client) -> RepoLoader:
     """Parse the content of a repository list and return a RepoLoader for it."""
-    # TODO use a transformer to turn repo list into a Rz
     tree = PARSER.parse(content)
     return RepoLoaderTransformer(gql_client=gql_client).transform(tree)
 
