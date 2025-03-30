@@ -18,6 +18,7 @@ from kivy.properties import ObjectProperty
 
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -34,15 +35,12 @@ from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 
 from . import auth
+from . import config
 from .data import Issue
 from .data import is_same_issue
 from .issue_cache import IssueCache
 from .issue_loader import IssueLoader
-from .repo_loader import CurrentUserRepoLoader
-from .repo_loader import OrgRepoLoader
-from .repo_loader import FileRepoLoader
-from .repo_loader import SequentialRepoLoaders
-from .repo_loader import VcsRepoLoader
+from .repo_loader import parse_repository_list
 from .filter import parse as parse_filter
 
 
@@ -172,54 +170,41 @@ class IssueScreen(Screen):
         anim.start(issue_widget)
 
 
+class RepoButton(Button):
+    """RepoPickerScreen button.
+
+    This is a class so I can customize in kv language.
+    """
+
+    def __init__(self, repo_picker, *args, **kwargs):
+        self._repo_picker = repo_picker
+        self._display_name = kwargs["text"]
+        super().__init__(*args, **kwargs)
+
+    def on_release(self):
+        print("CLicked:", self._display_name)
+        self._repo_picker.use_repo_list(self._display_name)
+
+
 class RepoPickerScreen(Screen):
 
-    def use_all_user_repos(self):
-        self.manager.switch_to(
-            RepoLoadingScreen(CurrentUserRepoLoader(App.get_running_app().gql_client))
-        )
+    def __init__(self, *args, **kwargs):
+        self._config = config.Config()
+        super().__init__(*args, **kwargs)
 
-    def use_all_gazebo_repos(self):
-        self.manager.switch_to(
-            RepoLoadingScreen(
-                SequentialRepoLoaders(
-                    repo_loaders=[
-                        OrgRepoLoader("gazebosim", App.get_running_app().gql_client),
-                        OrgRepoLoader(
-                            "gazebo-tooling", App.get_running_app().gql_client
-                        ),
-                        OrgRepoLoader(
-                            "gazebo-release", App.get_running_app().gql_client
-                        ),
-                    ],
-                )
-            )
-        )
+    def on_pre_enter(self):
+        for name in self._config.repository_list_names():
+            btn = RepoButton(repo_picker=self, text=name)
+            self.ids.stack.add_widget(btn)
 
-    def use_all_rmf_repos(self):
-        self.manager.switch_to(
-            RepoLoadingScreen(
-                OrgRepoLoader("open-rmf", App.get_running_app().gql_client)
-            )
+    def use_repo_list(self, display_name):
+        repo_list = self._config.repository_list(display_name)
+        repo_loader = parse_repository_list(
+            repo_list.content,
+            # TODO pass this into repo loader
+            gql_client=App.get_running_app().gql_client,
         )
-
-    def use_all_infra_repos(self):
-        self.manager.switch_to(
-            RepoLoadingScreen(
-                VcsRepoLoader(
-                    "https://raw.githubusercontent.com/ros-infrastructure/ci/refs/heads/main/ros-infrastructure.repos"
-                )
-            )
-        )
-
-    def use_all_ros_repos(self):
-        self.manager.switch_to(
-            RepoLoadingScreen(
-                FileRepoLoader(
-                    pathlib.Path(__file__).parent.resolve() / "ros_pmc_repos.txt"
-                )
-            )
-        )
+        self.manager.switch_to(RepoLoadingScreen(repo_loader))
 
 
 class RepoLoadingScreen(Screen):
@@ -336,6 +321,7 @@ class TreadIApp(App):
         # Window.always_on_top = True
 
         self.sm = ScreenManager()
+        config.create_or_update_config()
 
         token_response = auth.cycle_cached_token()
         if not self.make_client_from_response(token_response):

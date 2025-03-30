@@ -111,29 +111,33 @@
 
 
 <RepoPickerScreen>:
-    BoxLayout:
-        orientation: 'vertical'
+    StackLayout:
+        id: stack
+        orientation: "lr-tb"
+
         Label:
+            size_hint_y: 0.1
             font_size: '24sp'
-            text: "Pick repos to list issues from"
-        Button:
-            text: "Public repos I own"
-            on_release: root.use_all_user_repos()
-        Button:
-            text: "Gazebo simulator repos"
-            on_release: root.use_all_gazebo_repos()
-        Button:
-            text: "Open-RMF repos"
-            on_release: root.use_all_rmf_repos()
-        Button:
-            text: "OSRA Infrastructure repos"
-            on_release: root.use_all_infra_repos()
-        Button:
-            text: "ROS PMC repos"
-            on_release: root.use_all_ros_repos()
+            text: "Pick a repository list"
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.2, 0.2, 1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+
+            StackLayout:
+                id: stack
+                orientation: "lr-tb"
+                padding: '3dp'
+                spacing: '3dp'
+                size_hint_y: None
+                height: self.minimum_height
 
 
-<foobar>:
-    BoxLayout:
-        size_x: root.width
-        
+<RepoButton>:
+    size_hint: (1, None)
+    height: '60dp'

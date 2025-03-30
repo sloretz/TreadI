@@ -2,8 +2,8 @@
 %import common.WS_INLINE
 %ignore WS_INLINE
 
-# COMMENT: "#" /.*/ _NEWLINE?
-# %ignore COMMENT
+COMMENT: "#" /.*/ _NEWLINE?
+%ignore COMMENT
 
 start:  _NEWLINE* directive (_NEWLINE+ directive?)*
 

@@ -29,4 +29,3 @@ def test_single_repo_directives():
     assert Repository(owner="sloretz", name="baz.foo") in repo_loader.repos()
     assert Repository(owner="my-org", name="MyRepo") in repo_loader.repos()
     assert Repository(owner="cool", name="story_bro") in repo_loader.repos()
-

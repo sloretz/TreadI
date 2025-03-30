@@ -22,7 +22,7 @@ def config_dir():
     return Path(user_config_dir("TreadI"))
 
 
-def create_or_upgrade_config():
+def create_or_update_config():
     """Create an initialize the config directory if none exists."""
     cdir = config_dir()
     if cdir.exists():
@@ -93,12 +93,9 @@ class Config:
         self._logger = logging.getLogger("Config")
 
     def repository_list_names(self):
-        """Return a list of tuples of repository list names.
-
-        The first item in the list is the repositori
-        """
+        """Return a list of repository list display names."""
         repo_list_d = config_dir() / _REPO_LIST_DIR
-        display_names = []
+        rank_name = []
         for file in repo_list_d.iterdir():
             if file.name == "README.md":
                 continue
@@ -106,8 +103,17 @@ class Config:
             if match is None:
                 self._logger.warning(f"Invalid repository list file name: {file.name}")
                 continue
-            display_names.append(_make_repo_list_display_name(match.group("name")))
-        return display_names
+            rank_name.append(
+                (
+                    int(match.group("rank")),
+                    _make_repo_list_display_name(match.group("name")),
+                )
+            )
+
+        # Rely on stable sorting to make rank primary key, and display name secondary
+        rank_name.sort(key=lambda i: i[1].lower())
+        rank_name.sort(key=lambda i: i[0])
+        return [i[1] for i in rank_name]
 
     def repository_list(self, display_name):
         """Given a display name, return the repository list content.
