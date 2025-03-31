@@ -4,6 +4,7 @@ from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 
 from ..issue_loader import IssueLoader
+from .issue_screen import IssueScreen
 
 
 class IssueLoadingScreen(Screen):
@@ -17,6 +18,8 @@ class IssueLoadingScreen(Screen):
             App.get_running_app().issue_cache,
             self.update_progress,
         )
+        if "name" not in kwargs:
+            kwargs["name"] = "issue-loading-screen"
         super().__init__(**kwargs)
 
     def update_progress(self, progress):
@@ -26,5 +29,4 @@ class IssueLoadingScreen(Screen):
 
     def switch_to_issues(self):
         # Must only be called on main thread
-        self.manager.transition.direction = "left"
-        self.manager.current = "issues"
+        self.manager.switch_to(IssueScreen(), direction="left")

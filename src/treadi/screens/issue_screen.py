@@ -3,6 +3,7 @@ import webbrowser
 
 from kivy.animation import Animation
 from kivy.app import App
+from kivy.core.window import Window
 from kivy.properties import ColorProperty
 from kivy.properties import ObjectProperty
 from kivy.uix.behaviors import ButtonBehavior
@@ -49,7 +50,9 @@ class IssueScreen(Screen):
 
     def __init__(self, *args, **kwargs):
         self._filter = None
-        self._logger = logging.getLogger("IssueLoader")
+        self._logger = logging.getLogger("IssueScreen")
+        if "name" not in kwargs:
+            kwargs["name"] = "issues-screen"
         super().__init__(*args, **kwargs)
 
     def validate_filter(self):
@@ -77,6 +80,15 @@ class IssueScreen(Screen):
     def on_pre_enter(self):
         issue_cache = App.get_running_app().issue_cache
         self._refresh_issues()
+        Window.bind(on_key_down=self.on_key_down)
+
+    def on_pre_leave(self):
+        Window.unbind(on_key_down=self.on_key_down)
+
+    def on_key_down(self, window, key, scancode, codepoint, modifiers):
+        if key == 27:  # ESCAPE KEY
+            # TODO modal dialog to confirm
+            App.get_running_app().switch_to_pick_repos(direction="right")
 
     def _refresh_issues(self):
         # Clear and re-add issues
