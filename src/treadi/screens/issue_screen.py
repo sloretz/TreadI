@@ -20,7 +20,7 @@ class IssueScreenGoBackPopup(Popup):
 
     def on_go_back(self):
         App.get_running_app().switch_to_pick_repos(direction="right")
-        self.dismiss()
+        self.dismiss(animation=False)
 
 
 class IssueWidget(ButtonBehavior, BoxLayout):
@@ -105,9 +105,9 @@ class IssueScreen(Screen):
             if self._popup is None:
                 self._popup = IssueScreenGoBackPopup()
                 self._popup.bind(on_dismiss=self._forget_popup)
-                self._popup.open()
+                self._popup.open(animation=False)
             else:
-                self._popup.dismiss()
+                self._popup.dismiss(animation=False)
 
     def _refresh_issues(self):
         # Clear and re-add issues
