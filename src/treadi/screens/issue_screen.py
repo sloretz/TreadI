@@ -8,11 +8,19 @@ from kivy.properties import ColorProperty
 from kivy.properties import ObjectProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import Screen
 
 from ..data import Issue
 from ..data import is_same_issue
 from ..filter import parse as parse_filter
+
+
+class IssueScreenGoBackPopup(Popup):
+
+    def on_go_back(self):
+        App.get_running_app().switch_to_pick_repos(direction="right")
+        self.dismiss()
 
 
 class IssueWidget(ButtonBehavior, BoxLayout):
@@ -49,6 +57,7 @@ class IssueWidget(ButtonBehavior, BoxLayout):
 class IssueScreen(Screen):
 
     def __init__(self, *args, **kwargs):
+        self._popup = None
         self._filter = None
         self._logger = logging.getLogger("IssueScreen")
         if "name" not in kwargs:
@@ -85,10 +94,20 @@ class IssueScreen(Screen):
     def on_pre_leave(self):
         Window.unbind(on_key_down=self.on_key_down)
 
+    def _forget_popup(self, _):
+        self._popup = None
+
     def on_key_down(self, window, key, scancode, codepoint, modifiers):
         if key == 27:  # ESCAPE KEY
-            # TODO modal dialog to confirm
-            App.get_running_app().switch_to_pick_repos(direction="right")
+            # Loading issues again is time consuming.
+            # Make the user confirm that they really do want to pick
+            # repos again.
+            if self._popup is None:
+                self._popup = IssueScreenGoBackPopup()
+                self._popup.bind(on_dismiss=self._forget_popup)
+                self._popup.open()
+            else:
+                self._popup.dismiss()
 
     def _refresh_issues(self):
         # Clear and re-add issues
