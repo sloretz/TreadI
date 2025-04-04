@@ -43,3 +43,4 @@ class RepoPickerScreen(Screen):
             gql_client=App.get_running_app().gql_client,
         )
         self.manager.switch_to(RepoLoadingScreen(repo_loader), direction="left")
+        App.get_running_app().title += f": {display_name}"
