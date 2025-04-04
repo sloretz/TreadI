@@ -7,6 +7,7 @@ from kivy.config import Config as KvConfig
 
 KvConfig.set("graphics", "resizable", False)
 KvConfig.set("input", "mouse", "mouse,disable_multitouch")
+KvConfig.set("kivy", "exit_on_escape", 0)
 
 from kivy.core.window import Window
 
@@ -43,6 +44,7 @@ def make_gql_client(access_token):
 
 class TreadIApp(App):
 
+    # Globals accessible to all screens
     gql_client = None
     issue_loader = None
     issue_cache = IssueCache()
@@ -57,12 +59,19 @@ class TreadIApp(App):
     def on_login_result(self, _, token_response):
         if self.make_client_from_response(token_response):
             auth.store_refresh_token(token_response.refresh_token)
-            self.sm.transition.direction = "left"
-            self.sm.current = "repos"
+            self.switch_to_pick_repos()
         else:
             raise RuntimeError(
                 f"TODO more graceful response to login failure {token_response}"
             )
+
+    def switch_to_pick_repos(self, direction="left"):
+        """Called to switch to repo picker screen and reset."""
+        # This avoids a circular dependency in screen modules
+        issue_loader = None
+        issue_cache = IssueCache()
+        self.sm.transition.direction = direction
+        self.sm.switch_to(RepoPickerScreen())
 
     def build(self):
         # Window.always_on_top = True
@@ -75,10 +84,9 @@ class TreadIApp(App):
             # Ask user to login
             login_screen = LoginScreen()
             login_screen.bind(token_response=self.on_login_result)
-            self.sm.add_widget(login_screen)
-
-        self.sm.add_widget(RepoPickerScreen(name="repos"))
-        self.sm.add_widget(IssueScreen(name="issues"))
+            self.sm.switch_to(login_screen)
+        else:
+            self.switch_to_pick_repos()
 
         return self.sm
 

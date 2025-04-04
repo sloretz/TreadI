@@ -3,15 +3,24 @@ import webbrowser
 
 from kivy.animation import Animation
 from kivy.app import App
+from kivy.core.window import Window
 from kivy.properties import ColorProperty
 from kivy.properties import ObjectProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import Screen
 
 from ..data import Issue
 from ..data import is_same_issue
 from ..filter import parse as parse_filter
+
+
+class IssueScreenGoBackPopup(Popup):
+
+    def on_go_back(self):
+        App.get_running_app().switch_to_pick_repos(direction="right")
+        self.dismiss(animation=False)
 
 
 class IssueWidget(ButtonBehavior, BoxLayout):
@@ -48,8 +57,11 @@ class IssueWidget(ButtonBehavior, BoxLayout):
 class IssueScreen(Screen):
 
     def __init__(self, *args, **kwargs):
+        self._popup = None
         self._filter = None
-        self._logger = logging.getLogger("IssueLoader")
+        self._logger = logging.getLogger("IssueScreen")
+        if "name" not in kwargs:
+            kwargs["name"] = "issues-screen"
         super().__init__(*args, **kwargs)
 
     def validate_filter(self):
@@ -77,6 +89,25 @@ class IssueScreen(Screen):
     def on_pre_enter(self):
         issue_cache = App.get_running_app().issue_cache
         self._refresh_issues()
+        Window.bind(on_key_down=self.on_key_down)
+
+    def on_pre_leave(self):
+        Window.unbind(on_key_down=self.on_key_down)
+
+    def _forget_popup(self, _):
+        self._popup = None
+
+    def on_key_down(self, window, key, scancode, codepoint, modifiers):
+        if key == 27:  # ESCAPE KEY
+            # Loading issues again is time consuming.
+            # Make the user confirm that they really do want to pick
+            # repos again.
+            if self._popup is None:
+                self._popup = IssueScreenGoBackPopup()
+                self._popup.bind(on_dismiss=self._forget_popup)
+                self._popup.open(animation=False)
+            else:
+                self._popup.dismiss(animation=False)
 
     def _refresh_issues(self):
         # Clear and re-add issues

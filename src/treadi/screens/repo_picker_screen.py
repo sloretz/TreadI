@@ -26,6 +26,8 @@ class RepoPickerScreen(Screen):
 
     def __init__(self, *args, **kwargs):
         self._config = config.Config()
+        if "name" not in kwargs:
+            kwargs["name"] = "repo-picker-screen"
         super().__init__(*args, **kwargs)
 
     def on_pre_enter(self):
@@ -40,4 +42,4 @@ class RepoPickerScreen(Screen):
             # TODO pass this into repo loader
             gql_client=App.get_running_app().gql_client,
         )
-        self.manager.switch_to(RepoLoadingScreen(repo_loader))
+        self.manager.switch_to(RepoLoadingScreen(repo_loader), direction="left")

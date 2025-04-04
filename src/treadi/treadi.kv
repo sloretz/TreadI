@@ -110,6 +110,39 @@
             spacing: '3dp'
 
 
+<IssueScreenGoBackPopup>
+    auto_dismiss: False
+    title: "Go to repository lists?"
+    size_hint: (0.7, 0.7)
+
+    BoxLayout:
+        orientation: "vertical"
+
+        Label:
+            size_hint_y: 0.8
+            font_size: '18sp'
+            text: "Are you sure you want to go back to the repository lists?\n\nIf you decide to return to this same list, you will have to load all issues and PRs again. Any issues or PRs you dismissed will no longer be dismissed when you return."
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+
+        BoxLayout:
+            size_hint_y: 0.2
+            orientation: "horizontal"
+
+            Button:
+                size_hint_x: 0.7
+                text: "Yes I'm sure"
+                font_size: '24sp'
+                on_release: root.on_go_back()
+
+            Button:
+                size_hint_x: 0.3
+                text: "No"
+                font_size: '24sp'
+                on_release: root.dismiss(animation=False)
+
+
 <RepoPickerScreen>:
     StackLayout:
         id: stack
