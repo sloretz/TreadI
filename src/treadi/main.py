@@ -67,6 +67,8 @@ class TreadIApp(App):
 
     def switch_to_pick_repos(self, direction="left"):
         """Called to switch to repo picker screen and reset."""
+        # Reset title away from repo list name
+        self.title = "TreadI"
         # This avoids a circular dependency in screen modules
         issue_loader = None
         issue_cache = IssueCache()
