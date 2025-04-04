@@ -113,14 +113,15 @@
 <IssueScreenGoBackPopup>
     auto_dismiss: False
     title: "Go to repository lists?"
+    size_hint: (0.7, 0.7)
 
     BoxLayout:
         orientation: "vertical"
 
         Label:
             size_hint_y: 0.8
-            font_size: '15sp'
-            text: "Are you sure you want to go back to the repository lists?\n\nIf you go back to the repository lists and then return to this same list, you will have to load all issues and PRs again. If you dismissed any issues or PRs, they won't be dismissed when you return."
+            font_size: '18sp'
+            text: "Are you sure you want to go back to the repository lists?\n\nIf you decide to return to this same list, you will have to load all issues and PRs again. Any issues or PRs you dismissed will no longer be dismissed when you return."
             text_size: self.size
             halign: 'center'
             valign: 'middle'
