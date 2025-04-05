@@ -8,6 +8,7 @@ from kivy.properties import ColorProperty
 from kivy.properties import ObjectProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import Screen
 
@@ -23,6 +24,18 @@ class IssueScreenGoBackPopup(Popup):
         self.dismiss(animation=False)
 
 
+class ChangesRequestedWidget(Label):
+    pass
+
+
+class ApprovedWidget(Label):
+    pass
+
+
+class DraftWidget(Label):
+    pass
+
+
 class IssueWidget(ButtonBehavior, BoxLayout):
 
     color = ColorProperty(defaultvalue=[0.6, 0.6, 0.6, 1])
@@ -36,6 +49,14 @@ class IssueWidget(ButtonBehavior, BoxLayout):
         self.issue = issue
         self.dismiss_callback = dismiss_callback
         super().__init__(**kwargs)
+
+        if issue.is_pr:
+            if issue.draft:
+                self.ids.pr_status.add_widget(DraftWidget())
+            elif issue.approved:
+                self.ids.pr_status.add_widget(ApprovedWidget())
+            elif issue.changes_requested:
+                self.ids.pr_status.add_widget(ChangesRequestedWidget())
 
     def on_press(self):
         if self.last_touch.button == "left":

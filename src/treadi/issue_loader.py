@@ -6,10 +6,11 @@ from datetime import datetime
 from dateutil.parser import isoparse
 
 from .data import Issue
+from .data import PullRequest
 from .data import Repository
 
 
-def _make_issue(gh_data, is_pr=False):
+def _make_issue_kwargs(gh_data):
     repo = Repository(
         owner=gh_data["repository"]["owner"]["login"],
         name=gh_data["repository"]["name"],
@@ -19,17 +20,38 @@ def _make_issue(gh_data, is_pr=False):
         author = "ghost"
     else:
         author = gh_data["author"]["login"]
-    return Issue(
-        repo=repo,
-        author=author,
-        created_at=isoparse(gh_data["createdAt"]),
-        updated_at=isoparse(gh_data["updatedAt"]),
-        number=int(gh_data["number"]),
-        title=gh_data["title"],
-        url=gh_data["url"],
-        is_read=bool(gh_data["isReadByViewer"]),
-        is_pr=is_pr,
+    return {
+        "repo": repo,
+        "author": author,
+        "created_at": isoparse(gh_data["createdAt"]),
+        "updated_at": isoparse(gh_data["updatedAt"]),
+        "number": int(gh_data["number"]),
+        "title": gh_data["title"],
+        "url": gh_data["url"],
+        "is_read": bool(gh_data["isReadByViewer"]),
+    }
+
+
+def _make_pr(gh_data):
+    approved = False
+    changes_requested = False
+    for hc in gh_data["hovercard"]["contexts"]:
+        if "reviewDecision" in hc:
+            if hc["reviewDecision"] == "CHANGES_REQUESTED":
+                changes_requested = True
+            elif hc["reviewDecision"] == "APPROVED":
+                approved = True
+            break
+    return PullRequest(
+        approved=approved,
+        changes_requested=changes_requested,
+        draft=bool(gh_data["isDraft"]),
+        **_make_issue_kwargs(gh_data),
     )
+
+
+def _make_issue(gh_data):
+    return Issue(**_make_issue_kwargs(gh_data))
 
 
 FRAGMENT_ISSUE = """
@@ -62,6 +84,14 @@ fragment prFields on PullRequest {
     updatedAt
     url
     isReadByViewer
+    isDraft
+    hovercard {
+        contexts {
+            ... on ReviewStatusHovercardContext {
+                reviewDecision
+            }
+        }
+    }
     repository {
         name
         owner {
@@ -127,7 +157,7 @@ class IssueLoader:
     def _run(self):
         try:
             self._load_all_issues(
-                repos_per_query=10, progress_callback=self._progress_callback
+                repos_per_query=5, progress_callback=self._progress_callback
             )
         except:
             self._logger.exception("Exception in IssueLoader thread")
@@ -218,7 +248,7 @@ class IssueLoader:
                         del issue_page_info[r]
                 if "pullRequests" in repo_result:
                     for pr in repo_result["pullRequests"]["nodes"]:
-                        self._cache.insert(_make_issue(pr, is_pr=True))
+                        self._cache.insert(_make_pr(pr))
                         pr_count += 1
                     if repo_result["pullRequests"]["pageInfo"]["hasNextPage"]:
                         pr_page_info[r] = repo_result["pullRequests"]["pageInfo"]
@@ -256,4 +286,4 @@ class IssueLoader:
 
         prs = self._client.execute(gql(make_query("is:pr")))
         for pr in prs["search"]["nodes"]:
-            self._cache.insert(_make_issue(pr, is_pr=True))
+            self._cache.insert(_make_pr(pr))
