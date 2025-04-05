@@ -13,12 +13,16 @@ from kivy.core.window import Window
 
 Window.size = (500, 558)
 
+from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager
 
 import logging
 import pathlib
+import sys
 
+from gql import gql
 from gql import Client
+from gql.transport.exceptions import TransportServerError
 from gql.transport.requests import RequestsHTTPTransport
 
 from . import auth
@@ -42,6 +46,27 @@ def make_gql_client(access_token):
     return Client(transport=transport, schema=schema_path.read_text())
 
 
+def check_gql_works(gql_client):
+    query = gql(
+        """
+        query {
+            viewer {
+                login
+            }
+        }
+        """
+    )
+    try:
+        gql_client.execute(query)
+        return True
+    except TransportServerError:
+        return False
+
+
+class InvalidTokenPopup(Popup):
+    pass
+
+
 class TreadIApp(App):
 
     # Globals accessible to all screens
@@ -53,7 +78,7 @@ class TreadIApp(App):
     def make_client_from_response(self, token_response):
         if token_response.status == auth.Status.ACCESS_GRANTED:
             self.gql_client = make_gql_client(token_response.access_token)
-            return True
+            return check_gql_works(self.gql_client)
         return False
 
     def on_login_result(self, _, token_response):
@@ -84,17 +109,22 @@ class TreadIApp(App):
         # The device flow based login can only do public repos.
         pat = auth.get_personal_access_token()
         if pat.status == auth.Status.ACCESS_GRANTED:
-            self.make_client_from_response(pat)
-            self.switch_to_pick_repos()
-        else:
-            token_response = auth.cycle_cached_token()
-            if not self.make_client_from_response(token_response):
-                # Ask user to login
-                login_screen = LoginScreen()
-                login_screen.bind(token_response=self.on_login_result)
-                self.sm.switch_to(login_screen)
+            if not self.make_client_from_response(pat):
+                p = InvalidTokenPopup()
+                p.bind(on_dismiss=sys.exit)
+                p.open()
             else:
                 self.switch_to_pick_repos()
+            return self.sm
+
+        token_response = auth.cycle_cached_token()
+        if not self.make_client_from_response(token_response):
+            # Ask user to login
+            login_screen = LoginScreen()
+            login_screen.bind(token_response=self.on_login_result)
+            self.sm.switch_to(login_screen)
+        else:
+            self.switch_to_pick_repos()
 
         return self.sm
 
