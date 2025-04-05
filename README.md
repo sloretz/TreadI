@@ -3,7 +3,7 @@
 Drowning in Github issues and pull requests?
 TreadI helps you keep your head above water!
 
-<img src="doc/images/issue_screen.png" alt="TreadI screen displaying issues and PRs" width="400"/>
+<img src="docs/images/issue_screen.png" alt="TreadI screen displaying issues and PRs" width="400"/>
 
 TreadI displays the 5 most recently updated issues and PRs from any number of repos.
 
