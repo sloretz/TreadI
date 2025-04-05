@@ -1,4 +1,7 @@
+import copy
+
 from treadi.data import Issue
+from treadi.data import PullRequest
 from treadi.data import Repository
 import treadi.filter as tf
 
@@ -21,7 +24,7 @@ ISSUE_ROS_ROSDISTRO = Issue(
     is_read=False,
     is_pr=False,
 )
-PR_ROS_ROSDISTRO = Issue(
+PR_ROS_ROSDISTRO = PullRequest(
     repo=REPO_ROS_ROSDITRO,
     author="ghost",
     created_at=None,
@@ -54,9 +57,39 @@ def test_require_repo():
     assert not tf.RequireRepo("ros2", "ros2")(ISSUE_ROS_ROSDISTRO)
 
 
-def test_require_repo():
-    assert tf.RequireOrg("ros")(ISSUE_ROS_ROSDISTRO)
-    assert not tf.RequireOrg("ros2")(ISSUE_ROS_ROSDISTRO)
+def test_require_draft_if_pr():
+    assert tf.require_draft_if_pr(ISSUE_ROS_ROSDISTRO)
+    assert not tf.require_draft_if_pr(PR_ROS_ROSDISTRO)
+    draft_pr = copy.copy(PR_ROS_ROSDISTRO)
+    draft_pr.draft = True
+    assert tf.require_draft_if_pr(draft_pr)
+
+
+def test_require_approved_if_pr():
+    assert tf.require_approved_if_pr(ISSUE_ROS_ROSDISTRO)
+    assert not tf.require_approved_if_pr(PR_ROS_ROSDISTRO)
+    approved_pr = copy.copy(PR_ROS_ROSDISTRO)
+    approved_pr.approved = True
+    assert tf.require_approved_if_pr(approved_pr)
+
+
+def test_require_changes_requested_if_pr():
+    assert tf.require_changes_requested_if_pr(ISSUE_ROS_ROSDISTRO)
+    assert not tf.require_changes_requested_if_pr(PR_ROS_ROSDISTRO)
+    changes_requested_pr = copy.copy(PR_ROS_ROSDISTRO)
+    changes_requested_pr.changes_requested = True
+    assert tf.require_changes_requested_if_pr(changes_requested_pr)
+
+
+def test_require_no_review_if_pr():
+    assert tf.require_no_review_if_pr(ISSUE_ROS_ROSDISTRO)
+    assert tf.require_no_review_if_pr(PR_ROS_ROSDISTRO)
+    approved_pr = copy.copy(PR_ROS_ROSDISTRO)
+    approved_pr.approved = True
+    assert not tf.require_no_review_if_pr(approved_pr)
+    changes_requested_pr = copy.copy(PR_ROS_ROSDISTRO)
+    changes_requested_pr.changes_requested = True
+    assert not tf.require_no_review_if_pr(changes_requested_pr)
 
 
 def test_invert_requirement():
