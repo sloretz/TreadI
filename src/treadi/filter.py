@@ -24,6 +24,27 @@ def require_draft_if_pr(issue_or_pr):
     return True
 
 
+def require_approved_if_pr(issue_or_pr):
+    """Return True if it is an Issue or an approved PR."""
+    if issue_or_pr.is_pr:
+        return issue_or_pr.approved
+    return True
+
+
+def require_changes_requested_if_pr(issue_or_pr):
+    """Return True if it is an Issue or a PR with changes requested."""
+    if issue_or_pr.is_pr:
+        return issue_or_pr.changes_requested
+    return True
+
+
+def require_no_review_if_pr(issue_or_pr):
+    """Return True if it is an Issue or a PR with no reviews."""
+    if issue_or_pr.is_pr:
+        return not issue_or_pr.changes_requested and not issue_or_pr.approved
+    return True
+
+
 class RequireAuthor:
 
     def __init__(self, author):
@@ -115,7 +136,12 @@ class FilterTransformer(lark.Transformer):
             return require_draft_if_pr
 
     def review_stmt(self, args):
-        raise NotImplementedError
+        if args[0] == "approved":
+            return require_approved_if_pr
+        if args[0] == "changes_requested":
+            return require_changes_requested_if_pr
+        if args[0] == "none":
+            return require_no_review_if_pr
 
     def repo_stmt(self, args):
         return RequireRepo(args[0].value, args[1].value)
