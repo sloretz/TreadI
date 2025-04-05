@@ -10,18 +10,24 @@ import keyring
 
 
 SERVICE = "TreadI"
-USERNAME = "GithubRefreshToken"
+REFRESH_TOKEN_USERNAME = "GithubRefreshToken"
+PAT_TOKEN_USERNAME = "GithubPersonalAccessToken"
 
 
 def get_refresh_token():
-    refresh_token = keyring.get_password(SERVICE, USERNAME)
+    refresh_token = keyring.get_password(SERVICE, REFRESH_TOKEN_USERNAME)
     if refresh_token is not None:
-        keyring.delete_password(SERVICE, USERNAME)
+        keyring.delete_password(SERVICE, REFRESH_TOKEN_USERNAME)
     return refresh_token
 
 
 def store_refresh_token(refresh_token):
-    keyring.set_password(SERVICE, USERNAME, refresh_token)
+    keyring.set_password(SERVICE, REFRESH_TOKEN_USERNAME, refresh_token)
+
+
+def load_personal_access_token():
+    # Returns None if no PAT is stored in the keyring
+    return keyring.get_password(SERVICE, PAT_TOKEN_USERNAME)
 
 
 @dataclass
@@ -45,7 +51,10 @@ def start_device_flow(*, client_id=CLIENT_ID):
         device_code=response["device_code"][0],
         user_code=response["user_code"][0],
         verification_uri=response["verification_uri"][0],
-        interval=int(response["interval"][0]),
+        # Plus 1 because I get a bunch erroneous slow_down errors.
+        # Even the official gh CLI gets these
+        # https://github.com/cli/cli/issues/9370
+        interval=int(response["interval"][0]) + 1,
         expires_in=int(response["expires_in"][0]),
     )
 
@@ -133,3 +142,11 @@ def cycle_cached_token():
     if response.status == Status.ACCESS_GRANTED:
         store_refresh_token(response.refresh_token)
     return response
+
+
+def get_personal_access_token() -> TokenResponse:
+    pat = load_personal_access_token()
+    if pat is None:
+        return TokenResponse(status=Status.NO_TOKEN)
+
+    return TokenResponse(status=Status.ACCESS_GRANTED, access_token=pat)

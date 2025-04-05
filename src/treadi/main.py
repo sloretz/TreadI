@@ -76,19 +76,25 @@ class TreadIApp(App):
         self.sm.switch_to(RepoPickerScreen())
 
     def build(self):
-        # Window.always_on_top = True
-
         self.sm = ScreenManager()
         config.create_or_update_config()
 
-        token_response = auth.cycle_cached_token()
-        if not self.make_client_from_response(token_response):
-            # Ask user to login
-            login_screen = LoginScreen()
-            login_screen.bind(token_response=self.on_login_result)
-            self.sm.switch_to(login_screen)
-        else:
+        # Prefer a PAT because a user might have granted it
+        # private repo access and want to maintain a private repo.
+        # The device flow based login can only do public repos.
+        pat = auth.get_personal_access_token()
+        if pat.status == auth.Status.ACCESS_GRANTED:
+            self.make_client_from_response(pat)
             self.switch_to_pick_repos()
+        else:
+            token_response = auth.cycle_cached_token()
+            if not self.make_client_from_response(token_response):
+                # Ask user to login
+                login_screen = LoginScreen()
+                login_screen.bind(token_response=self.on_login_result)
+                self.sm.switch_to(login_screen)
+            else:
+                self.switch_to_pick_repos()
 
         return self.sm
 
