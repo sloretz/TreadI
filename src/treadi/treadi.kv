@@ -143,6 +143,28 @@
                 on_release: root.dismiss(animation=False)
 
 
+<InvalidTokenPopup>
+    auto_dismiss: False
+    title: "Invalid token"
+    size_hint: (0.7, 0.7)
+
+    BoxLayout:
+        orientation: "vertical"
+        Label:
+            size_hint_y: 0.8
+            font_size: '18sp'
+            text: "TreadI is unable to authenticate with the Github API. Did your personal access token expire?"
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+
+        Button:
+            size_hint_y: 0.2
+            text: "Exit TreadI"
+            font_size: '24sp'
+            on_release: root.dismiss()
+
+
 <RepoPickerScreen>:
     StackLayout:
         id: stack
