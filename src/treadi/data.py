@@ -22,5 +22,13 @@ class Issue:
     is_pr: bool = False
 
 
+@dataclass
+class PullRequest(Issue):
+    is_pr: bool = True
+    approved: bool = False
+    changes_requested: bool = False
+    draft: bool = False
+
+
 def is_same_issue(l, r):
     return l.repo == r.repo and l.number == r.number
