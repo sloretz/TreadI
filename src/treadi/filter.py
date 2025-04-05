@@ -17,6 +17,13 @@ def require_issue(issue: Issue):
     return not issue.is_pr
 
 
+def require_draft_if_pr(issue_or_pr):
+    """Return True if it is an Issue or a draft PR."""
+    if issue_or_pr.is_pr:
+        return issue_or_pr.draft
+    return True
+
+
 class RequireAuthor:
 
     def __init__(self, author):
@@ -104,7 +111,8 @@ class FilterTransformer(lark.Transformer):
             return require_pr
         if args[0] == "issue":
             return require_issue
-        raise NotImplementedError
+        if args[0] == "draft":
+            return require_draft_if_pr
 
     def review_stmt(self, args):
         raise NotImplementedError
