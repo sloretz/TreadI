@@ -69,3 +69,6 @@ kramdown:
   hard_wrap         : false
   footnote_nr       : 1
   show_warnings     : false
+
+# Theme
+remote_theme: just-the-docs/just-the-docs
