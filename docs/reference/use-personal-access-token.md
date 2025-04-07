@@ -1,4 +1,7 @@
-# Use a personal access token
+---
+title: Personal access tokens
+parent: Reference
+---
 
 TreadI must authenticate with Github so that it can query issues and pull requests through [Github's API](https://docs.github.com/en/graphql).
 

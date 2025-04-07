@@ -1,4 +1,7 @@
-# Install TreadI
+---
+title: Install TreadI
+nav_order: 2
+---
 
 Use `pip` to Install [TreadI from the Python Package Index](https://pypi.org/project/TreadI/).
 
