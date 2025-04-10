@@ -3,4 +3,4 @@ title: Reference
 nav_order: 10
 ---
 
-Reference pages show detailed information about specific parts of TreadI.
+Read reference pages to learn about specific parts of TreadI.
