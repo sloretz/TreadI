@@ -1,5 +1,5 @@
 ---
-title: TreadI Documentation
+title: Why TreadI?
 nav_order: 1
 ---
 
