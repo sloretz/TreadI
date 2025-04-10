@@ -9,28 +9,28 @@ However, this only gives TreadI read access to public repositories.
 
 If you want to use TreadI with private repositories, then you must use a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
-## Create a personal access token for TreadI
+## Create a personal access token
 
 Navigate to [https://github.com/settings/tokens](https://github.com/settings/tokens).
 
 In the top right, click "Generate new token", then click the "Fine-grained, repo-scoped" option.
 
-![Github Generate new token button](docs/images/generate-new-token.png)
+<img src="{{site.baseurl}}/images/generate-new-token.png" alt="Github Generate new token button" width="256"/>
 
 Give the token a memorable name, like `TreadI Personal Access Token`.
 
-![Github Token name input box](docs/images/new-token-name.png)
+<img src="{{site.baseurl}}/images/new-token-name.png" alt="Github Token name input box" width="512"/>
 
 Under the `Repository access section`, choose `Only select repositories`, and choose the repositories you want to give TreadI access to.
 
-![Github Repository Access section](docs/images/new-token-only-select-repositories.png)
+<img src="{{site.baseurl}}/images/new-token-only-select-repositories.png" alt="Github Repository Access section" width="512"/>
 
 Click `Generate token`.
 
 Copy the generated token text.
 It should begin with text like `github_pat_`.
 
-![Github new token value](docs/images/new-token-value.png)
+<img src="{{site.baseurl}}/images/new-token-value.png" alt="Github new token value" width="512"/>
 
 ## Give Treadi the personal access token
 
@@ -47,9 +47,9 @@ Paste the token into the prompt and hit `[Enter]` to store it.
 
 TreadI will use this personal access token when you restart it.
 
-## Delete a personal access token
+## Delete your personal access token
 
-If you decide you want TreadI to stop using a personal access token, then you must delete the token from the keyring.
+If you decide you want TreadI to stop using your personal access token, then you must delete the token from the keyring.
 Delete the token by running the following command:
 
 ```
