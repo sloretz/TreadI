@@ -14,3 +14,5 @@ Run TreadI by typing the command `treadi`:
 ```
 $ treadi
 ```
+
+Next, follow the [Getting Started guide](./getting-started.html).

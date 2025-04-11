@@ -3,52 +3,56 @@ title: Filter Syntax
 parent: Reference
 ---
 
-Filter issues and pull requests by typing a filter string into the box at the top of TreadI.
+Filter issues and pull requests by typing a filter string into the box at the top of TreadI's issue screen.
 
-It uses a subset of the [Github search syntax](https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests).
+The filter syntax is similar to [Github search syntax](https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests).
 
-Combine filters by putting a space ` ` between them.
-Invert any filter by prepending a `-` character.
+* TOC
+{:toc}
 
-**Example:** *Show PRs authored by `sloretz` that are in any repository except `ros/rosdistro`*
+## Syntax
 
-```
-is:pr author:sloretz -repo:ros/rosdistro
-```
+### Only show issues and PRs from one user
 
-
-## author:USERNAME
-
-Show all issues and PRs opened by the user `USERNAME`.
-
-**Example:** *Show all issues and PRs opened by the user [sloretz](https://github.com/sloretz).*
+*Example: Show all issues and PRs created by the user [sloretz](https://github.com/sloretz).*
 
 ```
 author:sloretz
 ```
 
-## is:issue
+### Only show issues
 
-**Example:** *Show only issues*
+*Example:*
 
 ```
 is:issue
 ```
 
-## is:pr
+Alternatively, you may use `type` instead of `is`.
 
-**Example:** *Show only pull requests*
+```
+type:issue
+```
+
+### Only show pull reuests
+
+*Example:*
 
 ```
 is:pr
 ```
 
-## is:draft
+Alternatively, you may use `type` instead of `is`.
 
-Only show draft pull requests.
+```
+type:pr
+```
+
+### Only show draft pull requests
+
 Note, this does NOT exclude issues.
 
-**Example:** *Show issues and draft pull requests*
+*Example: Show issues and draft pull requests*
 
 ```
 is:draft
@@ -56,21 +60,44 @@ is:draft
 
 Combine with `is:pr` to show only draft pull requests
 
-**Example:** *Show only draft pull requests*
+*Example: Show only draft pull requests*
 
 ```
 is:pr is:draft
 ```
 
-####
+### Only show issues and pull requests from one organization
 
+*Example: Show only issues and PRs from the [ros2 organization](https://github.com/ros2)*
 
-* `is:issue` - Show only Issues
-* `is:issue` - Show only PRs
-* `org:OWNER` - Show only PRs from the given organization or user
-* `repo:owner/name` - Show only things from the repo `owner/name`
-* `type:issue` - Same as `is:issue`
-* `type:pr` - Same as `is:pr`
+```
+org:ros2
+```
 
-Invert filters by prepending `-`.
+### Only show issues and pull requests from one repository
 
+*Example: Show only issues and PRs from the [ros/rosdistro repository](https://github.com/ros/rosdistro)*
+
+```
+repo:ros/rosdistro
+```
+
+### Invert a filter
+
+Invert any filter by prepending a `-` character.
+
+*Example: Exclude draft PRs*
+
+```
+-is:draft
+```
+
+### Combine multiple filters
+
+Combine filters by putting a space between them.
+
+*Example: Show PRs authored by `sloretz` that are in any repository except `ros/rosdistro`*
+
+```
+is:pr author:sloretz -repo:ros/rosdistro
+```
