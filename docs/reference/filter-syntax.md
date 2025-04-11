@@ -10,7 +10,7 @@ The filter syntax is similar to [Github search syntax](https://docs.github.com/e
 * TOC
 {:toc}
 
-## Syntax
+## Filter Syntax
 
 ### Only show issues and PRs from one user
 
@@ -96,7 +96,7 @@ Invert any filter by prepending a `-` character.
 
 Combine filters by putting a space between them.
 
-*Example: Show PRs authored by `sloretz` that are in any repository except `ros/rosdistro`*
+*Example: Show PRs created by `sloretz` that are in any repository except `ros/rosdistro`*
 
 ```
 is:pr author:sloretz -repo:ros/rosdistro

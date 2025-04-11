@@ -31,7 +31,7 @@ Copy the generated token.
 
 <img src="{{site.baseurl}}/images/new-token-value.png" alt="Github new token value" width="512"/>
 
-## Give Treadi the personal access token
+## Give Treadi your personal access token
 
 TreadI uses the [keyring package](https://pypi.org/project/keyring/) to store Github tokens.
 Store the new token by running the following command in a terminal:
@@ -49,7 +49,7 @@ TreadI will use this personal access token as soon as you restart it.
 
 If you've saved a personal access token, then TreadI will always try to use it, even if the token expires.
 
-If you decide you want TreadI to stop using your personal access token, then you must delete the token from your keyring.
+If you want TreadI to stop using your personal access token, then you must delete it from your keyring.
 Delete the token by running the following command:
 
 ```
