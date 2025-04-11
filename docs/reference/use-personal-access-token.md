@@ -3,11 +3,11 @@ title: Personal access tokens
 parent: Reference
 ---
 
-TreadI needs to make API requests on your behalf in order to load issues and pull requests.
-The default authentication method uses TreadI's [Github App](https://docs.github.com/en/apps/overview).
-However, this only gives TreadI read access to public repositories.
+In order to load issues and pull requests, TreadI needs to query Github's API on your behalf.
+By default you authenticate through TreadI's [Github App](https://docs.github.com/en/apps/overview).
+However, **this only gives TreadI read access to public repositories**.
 
-If you want to use TreadI with private repositories, then you must use a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
+If you want to use TreadI with private repositories, then you must give TreadI a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
 ## Create a personal access token
 
@@ -41,15 +41,16 @@ Save the new token by running the following command in a terminal:
 keyring set TreadI GithubPersonalAccessToken
 ```
 
-The command will ask you for the `password`.
-The `password` is the value of the personal access token you just created.
-Paste the token into the prompt and hit `[Enter]` to store it.
+When the command asks you for a `password`, paste the value of the personal access token you created.
+Hit `[Enter]` to store it.
 
-TreadI will use this personal access token when you restart it.
+TreadI will use this personal access token as soon as you restart it.
 
 ## Delete your personal access token
 
-If you decide you want TreadI to stop using your personal access token, then you must delete the token from the keyring.
+If you've saved a personal access token, then TreadI will always try to use it, even if the token expires.
+
+If you decide you want TreadI to stop using your personal access token, then you must delete the token from your keyring.
 Delete the token by running the following command:
 
 ```
