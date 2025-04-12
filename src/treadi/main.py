@@ -103,6 +103,7 @@ class TreadIApp(App):
         self.sm.switch_to(RepoPickerScreen())
 
     def build(self):
+        self.icon = 'treadi_icon.png'
         self.sm = ScreenManager()
         config.create_or_update_config()
 

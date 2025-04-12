@@ -1,5 +1,7 @@
 # TreadI (Treading Issues)
 
+<imb src="docs/images/treadi_logo.svg alt="logo life ring resembling github issue icon" width="256">
+
 Drowning in Github issues and pull requests?
 TreadI helps you keep your head above water!
 
