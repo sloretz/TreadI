@@ -39,7 +39,7 @@ classifiers = [
 treadi = "treadi.main:main"
 
 [project.urls]
-"Homepage" = "https://github.com/sloretz/TreadI"
+"Homepage" = "https://sloretz.github.io/TreadI/"
 "Source" = "https://github.com/sloretz/TreadI"
 
 [tool.hatch.build.targets.wheel]
