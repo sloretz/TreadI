@@ -28,7 +28,6 @@ def _make_issue_kwargs(gh_data):
         "number": int(gh_data["number"]),
         "title": gh_data["title"],
         "url": gh_data["url"],
-        "is_read": bool(gh_data["isReadByViewer"]),
     }
 
 
@@ -64,7 +63,6 @@ fragment issueFields on Issue {
     title
     updatedAt
     url
-    isReadByViewer
     repository {
         name
         owner {
@@ -83,7 +81,6 @@ fragment prFields on PullRequest {
     title
     updatedAt
     url
-    isReadByViewer
     isDraft
     hovercard {
         contexts {

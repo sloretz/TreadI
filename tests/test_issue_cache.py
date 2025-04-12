@@ -21,7 +21,7 @@ def rand_repo():
     return Repository(owner=random_string(), name=random_string())
 
 
-def rand_issue(*, updated_at, repo=None, is_read=False):
+def rand_issue(*, updated_at, repo=None):
     if repo is None:
         repo = rand_repo()
     return Issue(
@@ -32,7 +32,6 @@ def rand_issue(*, updated_at, repo=None, is_read=False):
         number=random.randint(1, 9999),
         title=random_string(),
         url=random_string(),
-        is_read=is_read,
     )
 
 
@@ -82,16 +81,3 @@ def test_cache_update_dismissed():
     issue.updated_at = isoparse("2006-07-04T16:00:00Z")
     cache.insert(issue)
     assert [issue] == cache.most_recent_issues(1)
-
-
-def test_cache_update_dismissed_is_read():
-    cache = IssueCache()
-    issue = rand_issue(updated_at="2006-07-04T15:00:00Z")
-    cache.insert(issue)
-    cache.dismiss(issue)
-    assert [] == cache.most_recent_issues(1)
-    issue = copy.deepcopy(issue)
-    issue.updated_at = isoparse("2006-07-04T16:00:00Z")
-    issue.is_read = True
-    cache.insert(issue)
-    assert [] == cache.most_recent_issues(1)

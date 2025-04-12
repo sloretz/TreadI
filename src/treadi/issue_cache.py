@@ -24,13 +24,9 @@ class IssueCache:
                 if issue.updated_at <= d.updated_at:
                     # Not new data, nothing to do here
                     return
-                if not issue.is_read:
-                    # Put it into the incomming list
-                    del self.__dismissed[di]
-                    break
-                # Update the dismissed list
-                self.__dismissed[di] = issue
-                return
+                # Put it into the incomming list
+                del self.__dismissed[di]
+                break
         # If we get here, the issue belongs in the
         # upcomming list
         for ui, u in enumerate(self.__upcomming):
