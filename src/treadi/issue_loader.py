@@ -2,6 +2,7 @@ import threading
 import time
 import logging
 from gql import gql
+from gql.transport.exceptions import TransportServerError
 from datetime import datetime
 from dateutil.parser import isoparse
 
@@ -188,82 +189,98 @@ class IssueLoader:
         next_queries = []
         issue_count = 0
         pr_count = 0
-        while issue_page_info or pr_page_info:
-            # This loop looks for repos that still need to be explored
-            for r in self._repos:
-                issue_query = None
-                pr_query = None
-                if r in issue_page_info:
-                    ipi = issue_page_info[r]
-                    issue_query = IssueQuery(after=ipi["endCursor"])
-                if r in pr_page_info:
-                    prpi = pr_page_info[r]
-                    pr_query = PRQuery(after=prpi["endCursor"])
+        # Create a session to avoid closing and reopening the connection
+        # for each query
+        session = self._client.connect_sync()
+        try:
+            while issue_page_info or pr_page_info:
+                # This loop looks for repos that still need to be explored
+                for r in self._repos:
+                    issue_query = None
+                    pr_query = None
+                    if r in issue_page_info:
+                        ipi = issue_page_info[r]
+                        issue_query = IssueQuery(after=ipi["endCursor"])
+                    if r in pr_page_info:
+                        prpi = pr_page_info[r]
+                        pr_query = PRQuery(after=prpi["endCursor"])
 
-                if issue_query or pr_query:
-                    repo_query = (
-                        f'r{id(r)}: repository(owner: "{r.owner}", name: "{r.name}")'
+                    if issue_query or pr_query:
+                        repo_query = f'r{id(r)}: repository(owner: "{r.owner}", name: "{r.name}")'
+                        repo_query += "{"
+                        if issue_query:
+                            repo_query += str(issue_query)
+                        if pr_query:
+                            repo_query += str(pr_query)
+                        repo_query += "}"
+                        next_queries.append(repo_query)
+
+                    if len(next_queries) == repos_per_query:
+                        # Found enough repos, ditch the for loop
+                        break
+
+                # Execute the next query
+                joined_queries = "\n".join(next_queries)
+                query_str = f"""
+                    query {{
+                        {joined_queries}
+                    }}
+                    """
+                next_queries = []
+                # It's an error to include unused fragments,
+                # so only include a fragment if it's used.
+                if issue_page_info:
+                    query_str += FRAGMENT_ISSUE
+                if pr_page_info:
+                    query_str += FRAGMENT_PR
+                query = gql(query_str)
+
+                # Execute with exponential backoff in case we hit secondary
+                # rate limits from Github.
+                executed = False
+                error_count = 0
+                while not executed:
+                    try:
+                        result = session.execute(query)
+                        executed = True
+                    except gql.transport.exceptions.TransportServerError:
+                        self._logger.exception("Error when loading initial issues")
+                        error_count += 1
+                        time.sleep(15 + 4**error_count)
+
+                # Figure out what repos the query included,
+                # and add the issues and PRs to the cache
+                for r in self._repos:
+                    key = f"r{id(r)}"
+                    if key not in result:
+                        # Query didn't include this repo
+                        continue
+                    repo_result = result[key]
+                    if "issues" in repo_result:
+                        for issue in repo_result["issues"]["nodes"]:
+                            self._cache.insert(_make_issue(issue))
+                            issue_count += 1
+                        if repo_result["issues"]["pageInfo"]["hasNextPage"]:
+                            issue_page_info[r] = repo_result["issues"]["pageInfo"]
+                        else:
+                            del issue_page_info[r]
+                    if "pullRequests" in repo_result:
+                        for pr in repo_result["pullRequests"]["nodes"]:
+                            self._cache.insert(_make_pr(pr))
+                            pr_count += 1
+                        if repo_result["pullRequests"]["pageInfo"]["hasNextPage"]:
+                            pr_page_info[r] = repo_result["pullRequests"]["pageInfo"]
+                        else:
+                            del pr_page_info[r]
+                if progress_callback:
+                    i_max = pr_max = num_repos_at_start
+                    progress_callback(
+                        (i_max - len(issue_page_info) + pr_max - len(pr_page_info))
+                        / (i_max + pr_max)
                     )
-                    repo_query += "{"
-                    if issue_query:
-                        repo_query += str(issue_query)
-                    if pr_query:
-                        repo_query += str(pr_query)
-                    repo_query += "}"
-                    next_queries.append(repo_query)
-
-                if len(next_queries) == repos_per_query:
-                    # Found enough repos, ditch the for loop
-                    break
-
-            # Execute the next query
-            joined_queries = "\n".join(next_queries)
-            query_str = f"""
-                query {{
-                    {joined_queries}
-                }}
-                """
-            next_queries = []
-            # It's an error to include unused fragments,
-            # so only include a fragment if it's used.
-            if issue_page_info:
-                query_str += FRAGMENT_ISSUE
-            if pr_page_info:
-                query_str += FRAGMENT_PR
-            query = gql(query_str)
-            result = self._client.execute(query)
-
-            # Figure out what repos the query included,
-            # and add the issues and PRs to the cache
-            for r in self._repos:
-                key = f"r{id(r)}"
-                if key not in result:
-                    # Query didn't include this repo
-                    continue
-                repo_result = result[key]
-                if "issues" in repo_result:
-                    for issue in repo_result["issues"]["nodes"]:
-                        self._cache.insert(_make_issue(issue))
-                        issue_count += 1
-                    if repo_result["issues"]["pageInfo"]["hasNextPage"]:
-                        issue_page_info[r] = repo_result["issues"]["pageInfo"]
-                    else:
-                        del issue_page_info[r]
-                if "pullRequests" in repo_result:
-                    for pr in repo_result["pullRequests"]["nodes"]:
-                        self._cache.insert(_make_pr(pr))
-                        pr_count += 1
-                    if repo_result["pullRequests"]["pageInfo"]["hasNextPage"]:
-                        pr_page_info[r] = repo_result["pullRequests"]["pageInfo"]
-                    else:
-                        del pr_page_info[r]
-            if progress_callback:
-                i_max = pr_max = num_repos_at_start
-                progress_callback(
-                    (i_max - len(issue_page_info) + pr_max - len(pr_page_info))
-                    / (i_max + pr_max)
-                )
-        self._logger.info(f"Loaded {issue_count} issues and {pr_count} PRs")
+            self._logger.info(f"Loaded {issue_count} issues and {pr_count} PRs")
+        finally:
+            self._client.close_sync()
 
     def _update_all_issues(self):
 
