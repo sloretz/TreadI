@@ -17,8 +17,6 @@ class Issue:
     number: int = 0
     title: str = ""
     url: str = ""
-    # Has the current viewer looked at this issue or PR?
-    is_read: bool = False
     is_pr: bool = False
 
 

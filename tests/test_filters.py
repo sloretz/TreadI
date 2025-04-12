@@ -21,7 +21,6 @@ ISSUE_ROS_ROSDISTRO = Issue(
     number=42,
     title="fix stuff",
     url="",
-    is_read=False,
     is_pr=False,
 )
 PR_ROS_ROSDISTRO = PullRequest(
@@ -32,7 +31,6 @@ PR_ROS_ROSDISTRO = PullRequest(
     number=1,
     title="break stuff",
     url="",
-    is_read=False,
     is_pr=True,
 )
 
