@@ -95,8 +95,10 @@ class TreadIApp(App):
         # Reset title away from repo list name
         self.title = "TreadI"
         # This avoids a circular dependency in screen modules
-        issue_loader = None
-        issue_cache = IssueCache()
+        if self.issue_loader is not None:
+            self.issue_loader.stop()
+        self.issue_loader = None
+        self.issue_cache = IssueCache()
         self.sm.transition.direction = direction
         self.sm.switch_to(RepoPickerScreen())
 

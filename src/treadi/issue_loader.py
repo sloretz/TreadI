@@ -153,6 +153,10 @@ class IssueLoader:
         self._thread = threading.Thread(daemon=True, target=self._run)
         self._progress_callback = progress_callback
         self._thread.start()
+        self._stop = False
+
+    def stop(self):
+        self._stop = True
 
     def _run(self):
         try:
@@ -161,13 +165,15 @@ class IssueLoader:
             )
         except:
             self._logger.exception("Exception in IssueLoader thread")
-        while True:
-            time.sleep(15)
+        time.sleep(15)
+        while not self._stop:
             try:
                 # Uses search API to get updated issues and PRs
                 self._update_all_issues()
             except:
                 self._logger.exception("Exception in IssueLoader thread")
+            time.sleep(15)
+        self._logger.debug("IssueLoader thread exiting")
 
     def _load_all_issues(self, repos_per_query, progress_callback=None):
         num_repos_at_start = len(self._repos)
