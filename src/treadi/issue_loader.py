@@ -243,7 +243,7 @@ class IssueLoader:
                     try:
                         result = session.execute(query)
                         executed = True
-                    except gql.transport.exceptions.TransportServerError:
+                    except TransportServerError:
                         self._logger.exception("Error when loading initial issues")
                         error_count += 1
                         time.sleep(15 + 4**error_count)
