@@ -20,17 +20,16 @@
 
 title: TreadI Documentation
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  Are you a maintainer on many Github repositories?
+  Do have a backlog of issues and pull requests that you're struggling to make progress on?
+  If you're drowining in issues and pull requests, TreadI helps you keep your head above water.
+  Read these docs to get started.
 baseurl: "/TreadI" # the subpath of your site, e.g. /blog
 url: "https://sloretz.github.io"
 github_username:  sloretz
 
 # Build settings
 theme: just-the-docs
-plugins:
-  - jekyll-feed
 
 color_scheme: dark
 
