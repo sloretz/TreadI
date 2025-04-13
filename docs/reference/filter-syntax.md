@@ -58,12 +58,49 @@ Note, this does NOT exclude issues.
 is:draft
 ```
 
-Combine with `is:pr` to show only draft pull requests
+Combine with `is:pr` to show only draft pull requests.
 
 *Example: Show only draft pull requests*
 
 ```
 is:pr is:draft
+```
+
+### Only show approved pull requests
+
+Note, this does NOT exclude issues.
+
+*Example: Show issues and pull requests that have been approved*
+
+```
+review:approved
+```
+
+Combine with `is:pr` to show only approved pull requests.
+
+*Example: Show only approved pull requests*
+
+```
+is:pr review:approved
+```
+
+
+### Only show reviewed pull requests with changes requested
+
+Note, this does NOT exclude issues.
+
+*Example: Show issues and pull requests where a reviewer has requested changes*
+
+```
+review:changes_requested
+```
+
+Combine with `is:pr` to show only pull requests.
+
+*Example: Show only pull requests where a reviewer has requested changes*
+
+```
+is:pr review:changes_requested
 ```
 
 ### Only show issues and pull requests from one organization
