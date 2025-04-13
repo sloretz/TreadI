@@ -3,6 +3,10 @@ title: Why TreadI?
 nav_order: 1
 ---
 
+<p align="center">
+<img src="{{site.baseurl}}/images/treadi_logo.svg" alt="logo life ring resembling github issue icon" width="256"/>
+</p>
+
 Are you a maintainer on many Github repositories?
 Do have a backlog of issues and pull requests that you're struggling to make progress on?
 
