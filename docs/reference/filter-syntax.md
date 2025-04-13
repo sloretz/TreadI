@@ -12,7 +12,7 @@ The filter syntax is similar to [Github search syntax](https://docs.github.com/e
 
 ## Filter Syntax
 
-### Only show issues and PRs from one user
+### Show issues and PRs from one user
 
 *Example: Show all issues and PRs created by the user [sloretz](https://github.com/sloretz).*
 
@@ -20,7 +20,7 @@ The filter syntax is similar to [Github search syntax](https://docs.github.com/e
 author:sloretz
 ```
 
-### Only show issues
+### Show issues
 
 *Example:*
 
@@ -34,7 +34,7 @@ Alternatively, you may use `type` instead of `is`.
 type:issue
 ```
 
-### Only show pull reuests
+### Show pull reuests
 
 *Example:*
 
@@ -48,7 +48,7 @@ Alternatively, you may use `type` instead of `is`.
 type:pr
 ```
 
-### Only show draft pull requests
+### Show draft pull requests
 
 Note, this does NOT exclude issues.
 
@@ -66,7 +66,7 @@ Combine with `is:pr` to show only draft pull requests.
 is:pr is:draft
 ```
 
-### Only show approved pull requests
+### Show pull requests if a reviewer approved it
 
 Note, this does NOT exclude issues.
 
@@ -85,7 +85,7 @@ is:pr review:approved
 ```
 
 
-### Only show reviewed pull requests with changes requested
+### Show pull requests if a reviewer requested changes
 
 Note, this does NOT exclude issues.
 
@@ -103,7 +103,25 @@ Combine with `is:pr` to show only pull requests.
 is:pr review:changes_requested
 ```
 
-### Only show issues and pull requests from one organization
+### Show pull requests if they have not been reviewed
+
+Note, this does NOT exclude issues.
+
+*Example: Show issues and pull requests that have not been reviewed*
+
+```
+review:none
+```
+
+Combine with `is:pr` to show only pull requests.
+
+*Example: Show only pull requests that have not been reviewed*
+
+```
+is:pr review:none
+```
+
+### Show issues and pull requests from one organization
 
 *Example: Show only issues and PRs from the [ros2 organization](https://github.com/ros2)*
 
@@ -111,7 +129,7 @@ is:pr review:changes_requested
 org:ros2
 ```
 
-### Only show issues and pull requests from one repository
+### Show issues and pull requests from one repository
 
 *Example: Show only issues and PRs from the [ros/rosdistro repository](https://github.com/ros/rosdistro)*
 
