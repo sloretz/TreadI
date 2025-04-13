@@ -7,97 +7,142 @@ GRAMMAR = (pathlib.Path(__file__).parent.resolve() / "filter.lark").read_text()
 PARSER = lark.Lark(GRAMMAR, parser="lalr")
 
 
-def require_pr(issue: Issue):
+class Requirement:
+
+    def __call__(self, issue_or_pr) -> bool:
+        """Return True if the requirement is met."""
+        raise NotImplementedError
+
+    def invert(self, issue_or_pr) -> bool:
+        """Return False if the requirement is met."""
+        # Some requirments ignore issues,
+        # so the inverse must also return True for issues
+        return not self(issue_or_pr)
+
+
+class RequirePR(Requirement):
     """Return True if the issue is a PR."""
-    return issue.is_pr
+
+    def __call__(self, issue_or_pr) -> bool:
+        return issue_or_pr.is_pr
 
 
-def require_issue(issue: Issue):
+class RequireIssue(Requirement):
     """Return True if the issue is an issue."""
-    return not issue.is_pr
+
+    def __call__(self, issue_or_pr) -> bool:
+        return not issue_or_pr.is_pr
 
 
-def require_draft_if_pr(issue_or_pr):
+class RequireDraftIfPR(Requirement):
     """Return True if it is an Issue or a draft PR."""
-    if issue_or_pr.is_pr:
-        return issue_or_pr.draft
-    return True
+
+    def __call__(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return issue_or_pr.draft
+        return True
+
+    def invert(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return not issue_or_pr.draft
+        return True
 
 
-def require_approved_if_pr(issue_or_pr):
+class RequireApprovedIfPR(Requirement):
     """Return True if it is an Issue or an approved PR."""
-    if issue_or_pr.is_pr:
-        return issue_or_pr.approved
-    return True
+
+    def __call__(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return issue_or_pr.approved
+        return True
+
+    def invert(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return not issue_or_pr.approved
+        return True
 
 
-def require_changes_requested_if_pr(issue_or_pr):
+class RequireChangesRequestedIfPR(Requirement):
     """Return True if it is an Issue or a PR with changes requested."""
-    if issue_or_pr.is_pr:
-        return issue_or_pr.changes_requested
-    return True
+
+    def __call__(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return issue_or_pr.changes_requested
+        return True
+
+    def invert(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return not issue_or_pr.changes_requested
+        return True
 
 
-def require_no_review_if_pr(issue_or_pr):
+class RequireNoReviewIfPR(Requirement):
     """Return True if it is an Issue or a PR with no reviews."""
-    if issue_or_pr.is_pr:
-        return not issue_or_pr.changes_requested and not issue_or_pr.approved
-    return True
+
+    def __call__(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return not issue_or_pr.changes_requested and not issue_or_pr.approved
+        return True
+
+    def invert(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return issue_or_pr.changes_requested or issue_or_pr.approved
+        return True
 
 
-class RequireAuthor:
+class RequireAuthor(Requirement):
 
     def __init__(self, author):
         self._author = author
 
-    def __call__(self, issue: Issue):
+    def __call__(self, issue_or_pr):
         """Return True if the issue is authored by this author."""
-        return self._author.lower() == issue.author.lower()
+        return self._author.lower() == issue_or_pr.author.lower()
 
 
-class RequireRepo:
+class RequireRepo(Requirement):
 
     def __init__(self, owner, name):
         self._owner = owner
         self._name = name
 
-    def __call__(self, issue: Issue):
+    def __call__(self, issue_or_pr):
         """Return True if the issue belongs to the given repo."""
         return (
-            self._owner.lower() == issue.repo.owner.lower()
-            and self._name.lower() == issue.repo.name.lower()
+            self._owner.lower() == issue_or_pr.repo.owner.lower()
+            and self._name.lower() == issue_or_pr.repo.name.lower()
         )
 
 
-class RequireOrg:
+class RequireOrg(Requirement):
 
     def __init__(self, org):
         self._org = org
 
-    def __call__(self, issue: Issue):
+    def __call__(self, issue_or_pr):
         """Return True if the issue belongs to the given organization."""
-        return self._org.lower() == issue.repo.owner.lower()
+        return self._org.lower() == issue_or_pr.repo.owner.lower()
 
 
-class InvertRequirement:
+class Invert(Requirement):
 
     def __init__(self, requirement):
         self._requirement = requirement
 
-    def __call__(self, issue: Issue):
+    def __call__(self, issue_or_pr):
         """Return the opposite of what the requirement returns."""
-        return not self._requirement(issue)
+        return self._requirement.invert(issue_or_pr)
 
 
-class RequireAll:
+class RequireAll(Requirement):
 
     def __init__(self, requirements):
         self._requirements = tuple(requirements)
 
-    def __call__(self, issue: Issue):
+    def __call__(self, issue_or_pr):
         """Return True iff all requirements are met."""
         for requirement in self._requirements:
-            if not requirement(issue):
+            if not requirement(issue_or_pr):
                 return False
         return True
 
@@ -113,13 +158,13 @@ class FilterTransformer(lark.Transformer):
 
     def maybe_negated_statement(self, args):
         if args[0] == "-":
-            return InvertRequirement(args[1])
+            return Invert(args[1])
         return args[0]
 
     def type_stmt(self, args):
         if args[0] == "pr":
-            return require_pr
-        return require_issue
+            return RequirePR()
+        return RequireIssue()
 
     def author_stmt(self, args):
         return RequireAuthor(args[0].value)
@@ -129,19 +174,19 @@ class FilterTransformer(lark.Transformer):
 
     def is_stmt(self, args):
         if args[0] == "pr":
-            return require_pr
+            return RequirePR()
         if args[0] == "issue":
-            return require_issue
+            return RequireIssue()
         if args[0] == "draft":
-            return require_draft_if_pr
+            return RequireDraftIfPR()
 
     def review_stmt(self, args):
         if args[0] == "approved":
-            return require_approved_if_pr
+            return RequireApprovedIfPR()
         if args[0] == "changes_requested":
-            return require_changes_requested_if_pr
+            return RequireChangesRequestedIfPR()
         if args[0] == "none":
-            return require_no_review_if_pr
+            return RequireNoReviewIfPR()
 
     def repo_stmt(self, args):
         return RequireRepo(args[0].value, args[1].value)
