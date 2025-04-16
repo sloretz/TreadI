@@ -216,6 +216,41 @@
             font_size: '24sp'
             on_release: root.dismiss()
 
+<RepoPickerScreenHelpPopup>:
+    auto_dismiss: False
+    title: "Repository Picker Help"
+    size_hint: (1, 0.7)
+
+    BoxLayout:
+        orientation: "vertical"
+        Label:
+            size_hint_y: 0.1
+            text: "TreadI Version"
+            font_size: '18sp'
+        Label:
+            size_hint_y: 0.1
+            font_size: '18sp'
+            text: root._version
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+        Label:
+            size_hint_y: 0.1
+            text: "Location of repository_lists.d"
+            font_size: '18sp'
+        Label:
+            size_hint_y: 0.1
+            font_size: '15sp'
+            text: str(root._config.repository_lists_dir)
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+
+        Button:
+            size_hint_y: 0.2
+            text: "Close Help"
+            font_size: '24sp'
+            on_release: root.dismiss()
 
 <RepoPickerScreen>:
     StackLayout:

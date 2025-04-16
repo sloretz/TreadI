@@ -92,11 +92,14 @@ class Config:
     def __init__(self):
         self._logger = logging.getLogger("Config")
 
+    @property
+    def repository_lists_dir(self):
+        return config_dir() / _REPO_LIST_DIR
+
     def repository_list_names(self):
         """Return a list of repository list display names."""
-        repo_list_d = config_dir() / _REPO_LIST_DIR
         rank_name = []
-        for file in repo_list_d.iterdir():
+        for file in self.repository_lists_dir.iterdir():
             if file.name == "README.md":
                 continue
             match = _REPO_LIST_REGEX.match(file.name)
@@ -120,8 +123,7 @@ class Config:
 
         raise RuntimeError if a repository list is not found.
         """
-        repo_list_d = config_dir() / _REPO_LIST_DIR
-        for file in repo_list_d.iterdir():
+        for file in self.repository_lists_dir.iterdir():
             match = _REPO_LIST_REGEX.match(file.name)
             if match is None:
                 self._logger.warning(f"Invalid repository list file name: {file.name}")
