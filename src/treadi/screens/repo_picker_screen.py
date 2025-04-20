@@ -29,7 +29,7 @@ class RepoButton(Button):
 class RepoPickerScreenHelpPopup(Popup):
 
     def __init__(self, config):
-        self._version = version('TreadI')
+        self._version = version("TreadI")
         self._config = config
         super().__init__()
 
@@ -53,7 +53,7 @@ class RepoPickerScreen(Screen):
         Window.unbind(on_key_down=self.on_key_down)
 
     def on_key_down(self, window, key, scancode, codepoint, modifiers):
-        if key == 47 and 'shift' in modifiers:  # ? KEY
+        if key == 47 and "shift" in modifiers:  # ? KEY
             if self._popup is None:
                 self._popup = RepoPickerScreenHelpPopup(self._config)
                 self._popup.bind(on_dismiss=self._forget_popup)
