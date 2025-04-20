@@ -216,6 +216,24 @@
             font_size: '24sp'
             on_release: root.dismiss()
 
+<RepoPickerScreenHelpPopup>:
+    auto_dismiss: False
+    title: "About TreadI"
+    size_hint: (1, 0.7)
+
+    BoxLayout:
+        orientation: "vertical"
+        TextInput:
+            size_hint_y: 0.9
+            readonly: True
+            text: "Version: " + root._version + "\nRepository lists directory:\n\t" + str(root._config.repository_lists_dir)
+            font_size: '15sp'
+
+        Button:
+            size_hint_y: 0.1
+            text: "Close"
+            font_size: '24sp'
+            on_release: root.dismiss()
 
 <RepoPickerScreen>:
     StackLayout:

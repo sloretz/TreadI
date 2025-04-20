@@ -11,16 +11,21 @@ Create a new list in the `repository_lists.d/` directory.
 TreadI creates this directory the first time it is run.
 The location of the directory depends on your operating system.
 
+Hit `[shift]` + `/` at the repository lists screen to open a dialog that shows the path.
+
 **Linux:**
+
+On Linux, TreadI will use a path like:
 
 ```
 ~/.config/TreadI/repository_lists.d
 ```
 
-*Note, the location respects the value of `XDG_CONFIG_HOME` or `XDG_HOME`.*
-*If you don't see `~/.config/TreadI` after you run TreadI once, then it has been created somewhere else according to the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/).*
+The location respects the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/).
 
 **OSX:**
+
+On OSX, TreadI will use a path like:
 
 ```
 /Users/YOUR USERNAME/Library/Application Support/TreadI/repository_lists.d
@@ -28,20 +33,15 @@ The location of the directory depends on your operating system.
 
 **Windows:**
 
-If you have a Windows machine, please run the following Python code to determine the config directory path.
-Then, please [open a PR to update this documentation](https://github.com/sloretz/TreadI).
+If you have a Windows machine, then please [open a PR to update this documentation](https://github.com/sloretz/TreadI).
 
-```python
-from pathlib import Path
-from platformdirs import user_config_dir
-
-base = Path(user_config_dir("TreadI"))
-print(base / Path("repository_lists.d"))
+```
+C:/Put/path/you/see/TreadI/use/here/repository_lists.d
 ```
 
 ## Create a repository list
 
-To create a custom repository list, create a file in `repository_lists.d/` with a name like this:
+Create a custom repository list by creating a file in `repository_lists.d/` with a name like this:
 
 ```
 XX_Some_Name.txt
