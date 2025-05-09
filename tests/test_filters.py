@@ -32,6 +32,7 @@ PR_ROS_ROSDISTRO = PullRequest(
     title="break stuff",
     url="",
     is_pr=True,
+    base_ref="rolling",
 )
 DRAFT_PR_ROS_ROSDISTRO = PullRequest(
     repo=REPO_ROS_ROSDITRO,
@@ -43,6 +44,7 @@ DRAFT_PR_ROS_ROSDISTRO = PullRequest(
     url="",
     is_pr=True,
     draft=True,
+    base_ref="main",
 )
 APPROVED_PR_ROS_ROSDISTRO = PullRequest(
     repo=REPO_ROS_ROSDITRO,
@@ -54,6 +56,7 @@ APPROVED_PR_ROS_ROSDISTRO = PullRequest(
     url="",
     is_pr=True,
     approved=True,
+    base_ref="master",
 )
 CHANGES_REQUESTED_PR_ROS_ROSDISTRO = PullRequest(
     repo=REPO_ROS_ROSDITRO,
@@ -65,6 +68,7 @@ CHANGES_REQUESTED_PR_ROS_ROSDISTRO = PullRequest(
     url="",
     is_pr=True,
     changes_requested=True,
+    base_ref="rolling",
 )
 
 
@@ -97,6 +101,23 @@ def test_require_draft_if_pr():
     assert f(ISSUE_ROS_ROSDISTRO)
     assert not f(PR_ROS_ROSDISTRO)
     assert f(DRAFT_PR_ROS_ROSDISTRO)
+
+
+def test_require_base_if_pr():
+    f = tf.parse("base:roll")
+    fnot = tf.parse("-base:roll")
+
+    rolling_pr = copy.deepcopy(PR_ROS_ROSDISTRO)
+    main_pr = copy.deepcopy(PR_ROS_ROSDISTRO)
+    rolling_pr.base_ref = "rolling"
+    main_pr.base_ref = "main"
+
+    assert f(ISSUE_ROS_ROSDISTRO)
+    assert fnot(ISSUE_ROS_ROSDISTRO)
+    assert f(rolling_pr)
+    assert not fnot(rolling_pr)
+    assert not f(main_pr)
+    assert fnot(main_pr)
 
 
 def test_invert_require_draft_if_pr():

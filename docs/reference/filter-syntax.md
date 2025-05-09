@@ -137,6 +137,24 @@ org:ros2
 repo:ros/rosdistro
 ```
 
+### Show pull requests targeting a specific branch name
+
+Note, this does NOT exclude issues.
+
+*Example: Show issues and pull requests that target branches whose names start with `rolling`*
+
+```
+base:rolling
+```
+
+Combine with `is:pr` to show only pull requests.
+
+*Example: Show only pull requests that target branches whose names start with `rolling`*
+
+```
+is:pr base:rolling
+```
+
 ### Invert a filter
 
 Invert any filter by prepending a `-` character.

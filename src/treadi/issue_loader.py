@@ -46,6 +46,7 @@ def _make_pr(gh_data):
         approved=approved,
         changes_requested=changes_requested,
         draft=bool(gh_data["isDraft"]),
+        base_ref=gh_data["baseRefName"],
         **_make_issue_kwargs(gh_data),
     )
 
@@ -90,6 +91,7 @@ fragment prFields on PullRequest {
             }
         }
     }
+    baseRefName
     repository {
         name
         owner {

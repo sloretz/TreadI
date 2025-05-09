@@ -12,6 +12,8 @@ start:  maybe_negated_statement (" "+ maybe_negated_statement)*
 USERNAME: /[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-z0-9])?/
 REPOSITORY_NAME: /[-._a-zA-Z0-9]+/
 MINUS: "-"
+# TODO too permissive is ok, but this is probably not permissive enough
+GIT_BRANCH: /[-._@{}a-zA-Z\/0-9]+/
 
 maybe_negated_statement: MINUS? statement
 
@@ -22,6 +24,7 @@ statement: type_stmt
          | review_stmt
          | repo_stmt
          | org_stmt
+         | base_stmt
  
 ISSUE: "issue"
 PR: "pr"
@@ -37,3 +40,4 @@ is_stmt: "is" ":" (DRAFT | ISSUE | PR)
 review_stmt: "review" ":" (NONE | APPROVED | CHANGES_REQUESTED)
 repo_stmt: "repo" ":" USERNAME "/" REPOSITORY_NAME
 org_stmt: "org" ":" USERNAME
+base_stmt: "base" ":" GIT_BRANCH

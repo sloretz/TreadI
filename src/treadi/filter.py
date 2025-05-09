@@ -124,6 +124,22 @@ class RequireOrg(Requirement):
         return self._org.lower() == issue_or_pr.repo.owner.lower()
 
 
+class RequireBaseBeginsWith(Requirement):
+
+    def __init__(self, base_prefix):
+        self._base_prefix = base_prefix
+
+    def __call__(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return issue_or_pr.base_ref.startswith(self._base_prefix)
+        return True
+
+    def invert(self, issue_or_pr) -> bool:
+        if issue_or_pr.is_pr:
+            return not self(issue_or_pr)
+        return True
+
+
 class Invert(Requirement):
 
     def __init__(self, requirement):
@@ -193,6 +209,9 @@ class FilterTransformer(lark.Transformer):
 
     def org_stmt(self, args):
         return RequireOrg(args[0].value)
+
+    def base_stmt(self, args):
+        return RequireBaseBeginsWith(args[0].value)
 
 
 def parse(filter: str):

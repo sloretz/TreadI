@@ -63,8 +63,15 @@ def test_repo(parser):
         parser.parse("repo:sloretz")
 
 
-def test_rorg(parser):
+def test_org(parser):
     parser.parse("org:ros2")
     parser.parse("org:ros-visualization")
     with pytest.raises(lark.UnexpectedToken):
         parser.parse("org:slo_retz")
+
+
+def test_base(parser):
+    parser.parse("base:ros2")
+    parser.parse("base:ros-visualization")
+    parser.parse("base:slo_retz")
+    parser.parse("base:slo/retz")
