@@ -26,6 +26,7 @@ class PullRequest(Issue):
     approved: bool = False
     changes_requested: bool = False
     draft: bool = False
+    base_ref: str = ""
 
 
 def is_same_issue(l, r):
