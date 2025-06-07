@@ -54,7 +54,12 @@ def test_cache_sorted():
     random.shuffle(issues_to_add)
     for i in issues_to_add:
         cache.insert(i)
-    assert [sixth, fifth, fourth] == cache.most_recent_issues(3)
+    assert [sixth, fifth, fourth] == cache.get_issues(3)
+
+    def ascending_sort(issues):
+        return sorted(issues, key=lambda i: i.updated_at)
+
+    assert [first, second, third] == cache.get_issues(3, sort=ascending_sort)
 
 
 def test_cache_dismissed():
@@ -66,9 +71,9 @@ def test_cache_dismissed():
     cache.insert(second)
     cache.insert(third)
     cache.dismiss(second)
-    assert [third, first] == cache.most_recent_issues(3)
+    assert [third, first] == cache.get_issues(3)
     cache.insert(second)
-    assert [third, first] == cache.most_recent_issues(3)
+    assert [third, first] == cache.get_issues(3)
 
 
 def test_cache_update_dismissed():
@@ -76,8 +81,8 @@ def test_cache_update_dismissed():
     issue = rand_issue(updated_at="2006-07-04T15:00:00Z")
     cache.insert(issue)
     cache.dismiss(issue)
-    assert [] == cache.most_recent_issues(1)
+    assert [] == cache.get_issues(1)
     issue = copy.deepcopy(issue)
     issue.updated_at = isoparse("2006-07-04T16:00:00Z")
     cache.insert(issue)
-    assert [issue] == cache.most_recent_issues(1)
+    assert [issue] == cache.get_issues(1)

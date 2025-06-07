@@ -33,10 +33,12 @@ class IssueCache:
             if is_same_issue(issue, u):
                 if issue.updated_at > u.updated_at:
                     self.__upcomming[ui] = issue
+                    self._sort()
                     return
                 return
         # If we get here, the issue is new to us
         self.__upcomming.append(issue)
+        self._sort()
 
     def dismiss(self, issue):
         """
@@ -56,15 +58,25 @@ class IssueCache:
                 # Move from upcomming to dismiseed
                 del self.__upcomming[ui]
                 self.__dismissed.append(u)
+                self._sort()
                 return
 
-    def most_recent_issues(self, n=1, filter=None):
+    def get_issues(self, n=1, filter=None, sort=None):
         """
-        Return the n most recently updated and not
-        dismissed issues.
+        Return n not dismissed issues.
+
+        :param n: The number of issues to return.
+        :param filter: A callable that takes an issue
+        and returns True if the issue should be included
+        in the result, or False if it should be excluded.
+
+        :param sort: A callable that takes a list of issues
+        and returns a sorted list of issues. If None, the
+        issues will be sorted by their updated_at field in
+        descending order (most recent first).
         """
         with self.__lock:
-            return self._most_recent_issues(n, filter)
+            return self._get_issues(n, filter, sort=sort)
 
     def newest_update_time(self):
         with self.__lock:
@@ -81,12 +93,16 @@ class IssueCache:
             return d[0].updated_at
         return u[0].updated_at
 
-    def _most_recent_issues(self, n, filter):
-        self._sort()
+    def _get_issues(self, n, filter, sort=None):
+        if sort is None:
+            # Assume self.__upcomming is always sorted
+            sorted_list = self.__upcomming
+        elif callable(sort):
+            sorted_list = sort(self.__upcomming)
         if filter is None:
-            return self.__upcomming[:n]
+            return sorted_list[:n]
         issues = []
-        for i in self.__upcomming:
+        for i in sorted_list:
             if filter(i):
                 # True means it passes the filter
                 issues.append(i)

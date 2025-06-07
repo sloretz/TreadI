@@ -134,7 +134,7 @@ class IssueScreen(Screen):
         # Clear and re-add issues
         self.ids.stack.clear_widgets()
         issue_cache = App.get_running_app().issue_cache
-        issues = issue_cache.most_recent_issues(n=5, filter=self._filter)
+        issues = issue_cache.get_issues(n=5, filter=self._filter)
         for i in issues:
             self._add_issue(i)
 
@@ -153,7 +153,7 @@ class IssueScreen(Screen):
                 child_issues.append(child.issue)
 
         # aim for 1 additional issue, because one is being dismissed
-        consider_issues = issue_cache.most_recent_issues(
+        consider_issues = issue_cache.get_issues(
             n=1 + len(child_issues), filter=self._filter
         )
         for itc in consider_issues:
