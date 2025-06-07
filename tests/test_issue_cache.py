@@ -56,6 +56,11 @@ def test_cache_sorted():
         cache.insert(i)
     assert [sixth, fifth, fourth] == cache.most_recent_issues(3)
 
+    def ascending_sort(issues):
+        return sorted(issues, key=lambda i: i.updated_at)
+
+    assert [first, second, third] == cache.most_recent_issues(3, sort=ascending_sort)
+
 
 def test_cache_dismissed():
     cache = IssueCache()
